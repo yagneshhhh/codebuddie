@@ -14,7 +14,210 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      analyses: {
+        Row: {
+          error: string | null
+          finished_at: string | null
+          id: string
+          repo_id: string
+          started_at: string
+          status: string
+          summary: string | null
+          user_id: string
+        }
+        Insert: {
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          repo_id: string
+          started_at?: string
+          status?: string
+          summary?: string | null
+          user_id: string
+        }
+        Update: {
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          repo_id?: string
+          started_at?: string
+          status?: string
+          summary?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analyses_repo_id_fkey"
+            columns: ["repo_id"]
+            isOneToOne: false
+            referencedRelation: "repos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      findings: {
+        Row: {
+          agent: string
+          analysis_id: string
+          created_at: string
+          detail: string | null
+          file_path: string | null
+          id: string
+          metadata: Json | null
+          severity: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          agent: string
+          analysis_id: string
+          created_at?: string
+          detail?: string | null
+          file_path?: string | null
+          id?: string
+          metadata?: Json | null
+          severity?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          agent?: string
+          analysis_id?: string
+          created_at?: string
+          detail?: string | null
+          file_path?: string | null
+          id?: string
+          metadata?: Json | null
+          severity?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "findings_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generated_tests: {
+        Row: {
+          analysis_id: string
+          created_at: string
+          id: string
+          language: string
+          source_file: string
+          target_function: string | null
+          test_code: string
+          user_id: string
+        }
+        Insert: {
+          analysis_id: string
+          created_at?: string
+          id?: string
+          language?: string
+          source_file: string
+          target_function?: string | null
+          test_code: string
+          user_id: string
+        }
+        Update: {
+          analysis_id?: string
+          created_at?: string
+          id?: string
+          language?: string
+          source_file?: string
+          target_function?: string | null
+          test_code?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_tests_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      github_tokens: {
+        Row: {
+          created_at: string
+          github_login: string | null
+          token_ciphertext: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          github_login?: string | null
+          token_ciphertext: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          github_login?: string | null
+          token_ciphertext?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      repos: {
+        Row: {
+          created_at: string
+          default_branch: string
+          description: string | null
+          github_full_name: string
+          id: string
+          language: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          default_branch?: string
+          description?: string | null
+          github_full_name: string
+          id?: string
+          language?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          default_branch?: string
+          description?: string | null
+          github_full_name?: string
+          id?: string
+          language?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
