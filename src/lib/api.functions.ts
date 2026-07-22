@@ -124,7 +124,7 @@ export const runAnalysis = createServerFn({ method: "POST" })
           analysis_id: analysisId, user_id: context.userId,
           agent: f.agent, severity: f.severity, title: f.title,
           detail: f.detail ?? null, file_path: f.file_path ?? null,
-          metadata: f.metadata ?? null,
+          metadata: (f.metadata ?? null) as never,
         })));
       }
       if (cov.tests.length) {
