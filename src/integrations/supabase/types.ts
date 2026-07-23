@@ -55,6 +55,50 @@ export type Database = {
           },
         ]
       }
+      analysis_chunks: {
+        Row: {
+          analysis_id: string
+          content: string
+          created_at: string
+          embedding: string
+          id: string
+          kind: string
+          metadata: Json | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          analysis_id: string
+          content: string
+          created_at?: string
+          embedding: string
+          id?: string
+          kind: string
+          metadata?: Json | null
+          source: string
+          user_id: string
+        }
+        Update: {
+          analysis_id?: string
+          content?: string
+          created_at?: string
+          embedding?: string
+          id?: string
+          kind?: string
+          metadata?: Json | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_chunks_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       findings: {
         Row: {
           agent: string
@@ -223,7 +267,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      match_analysis_chunks: {
+        Args: {
+          p_analysis_id: string
+          p_match_count?: number
+          p_query_embedding: string
+        }
+        Returns: {
+          content: string
+          id: string
+          kind: string
+          metadata: Json
+          similarity: number
+          source: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

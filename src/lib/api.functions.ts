@@ -96,8 +96,9 @@ export const runAnalysis = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ repoId: z.string() }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getRepoTree } = await import("@/lib/github.server");
+    const { getRepoTree, getRawFile } = await import("@/lib/github.server");
     const { runDependencyAgent, runDeadCodeAgent, runTestCoverageAgent } = await import("@/lib/agents/agents.server");
+    const { embedMany, toVectorLiteral } = await import("@/lib/embeddings.server");
 
     const { data: repo, error: rErr } = await context.supabase
       .from("repos").select("*").eq("id", data.repoId).maybeSingle();
@@ -134,6 +135,57 @@ export const runAnalysis = createServerFn({ method: "POST" })
           language: t.language, test_code: t.test_code,
         })));
       }
+      // ── Build & embed RAG chunks (findings + tests + sampled code) ──
+      type Chunk = { kind: string; source: string; content: string; metadata?: Record<string, unknown> };
+      const chunks: Chunk[] = [];
+      for (const f of allFindings) {
+        chunks.push({
+          kind: "finding",
+          source: f.file_path ?? f.agent,
+          content: `[${f.agent}/${f.severity}] ${f.title}\n${f.detail ?? ""}${f.file_path ? `\nFile: ${f.file_path}` : ""}`,
+          metadata: { agent: f.agent, severity: f.severity, file_path: f.file_path },
+        });
+      }
+      for (const t of cov.tests) {
+        chunks.push({
+          kind: "generated_test",
+          source: t.source_file,
+          content: `Generated ${t.language} test for ${t.source_file}:\n${t.test_code.slice(0, 3000)}`,
+          metadata: { source_file: t.source_file, language: t.language },
+        });
+      }
+      // Sample up to 8 source files (chunked to ~2000 chars each) for code context.
+      const SRC_RX = /\.(ts|tsx|js|jsx|py|md)$/;
+      const codeFiles = tree
+        .filter((f) => SRC_RX.test(f.path) && !/node_modules|dist|build|\.next|__pycache__/.test(f.path))
+        .slice(0, 8);
+      const raws = await Promise.all(codeFiles.map(async (f) => ({ path: f.path, raw: await getRawFile(token, repo.github_full_name, repo.default_branch, f.path) })));
+      for (const { path, raw } of raws) {
+        if (!raw) continue;
+        const CHUNK = 2000;
+        for (let i = 0; i < raw.length && i < 12000; i += CHUNK) {
+          chunks.push({
+            kind: "code",
+            source: path,
+            content: `File: ${path} (chars ${i}-${i + CHUNK})\n${raw.slice(i, i + CHUNK)}`,
+            metadata: { file_path: path, offset: i },
+          });
+        }
+      }
+      if (chunks.length) {
+        try {
+          const vecs = await embedMany(chunks.map((c) => c.content));
+          await supabaseAdmin.from("analysis_chunks").insert(chunks.map((c, i) => ({
+            analysis_id: analysisId, user_id: context.userId,
+            kind: c.kind, source: c.source, content: c.content,
+            metadata: (c.metadata ?? null) as never,
+            embedding: toVectorLiteral(vecs[i]) as unknown as never,
+          })));
+        } catch (embErr) {
+          console.error("embedding step failed", embErr);
+        }
+      }
+
       const summary = `${dep.length} dep · ${dead.length} dead-code · ${cov.findings.length} coverage · ${cov.tests.length} test(s) generated`;
       await supabaseAdmin.from("analyses").update({
         status: "done", summary, finished_at: new Date().toISOString(),
