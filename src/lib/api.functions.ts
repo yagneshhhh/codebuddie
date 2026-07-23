@@ -96,8 +96,9 @@ export const runAnalysis = createServerFn({ method: "POST" })
   .inputValidator((i: unknown) => z.object({ repoId: z.string() }).parse(i))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getRepoTree } = await import("@/lib/github.server");
+    const { getRepoTree, getRawFile } = await import("@/lib/github.server");
     const { runDependencyAgent, runDeadCodeAgent, runTestCoverageAgent } = await import("@/lib/agents/agents.server");
+    const { embedMany, toVectorLiteral } = await import("@/lib/embeddings.server");
 
     const { data: repo, error: rErr } = await context.supabase
       .from("repos").select("*").eq("id", data.repoId).maybeSingle();
