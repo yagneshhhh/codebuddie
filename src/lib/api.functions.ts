@@ -204,8 +204,100 @@ export const getAnalysis = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ id: z.string() }).parse(i))
   .handler(async ({ data, context }) => {
-    const { data: analysis } = await context.supabase.from("analyses").select("*, repos(github_full_name)").eq("id", data.id).maybeSingle();
+    const { data: analysis } = await context.supabase.from("analyses").select("*, repos(github_full_name, default_branch)").eq("id", data.id).maybeSingle();
     const { data: findings } = await context.supabase.from("findings").select("*").eq("analysis_id", data.id).order("severity", { ascending: false });
     const { data: tests } = await context.supabase.from("generated_tests").select("*").eq("analysis_id", data.id);
     return { analysis, findings: findings ?? [], tests: tests ?? [] };
   });
+
+// ── Create autonomous PR + comment from analysis ────────────────
+export const createAnalysisPR = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ analysisId: z.string() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { getBranchSha, createBranch, putFileOnBranch, createPullRequest, createIssueComment } =
+      await import("@/lib/github.server");
+
+    const { data: analysis } = await context.supabase
+      .from("analyses").select("*, repos(github_full_name, default_branch)")
+      .eq("id", data.analysisId).maybeSingle();
+    if (!analysis) throw new Error("Analysis not found");
+    const repo = (analysis as unknown as { repos: { github_full_name: string; default_branch: string } }).repos;
+
+    const { data: findings } = await context.supabase.from("findings").select("*").eq("analysis_id", data.analysisId);
+    const { data: tests } = await context.supabase.from("generated_tests").select("*").eq("analysis_id", data.analysisId);
+
+    const token = await getToken(context.userId);
+    const base = repo.default_branch || "main";
+    const branch = `sentinel/analysis-${data.analysisId.slice(0, 8)}`;
+
+    // Branch (idempotent: ignore "already exists")
+    try {
+      const baseSha = await getBranchSha(token, repo.github_full_name, base);
+      await createBranch(token, repo.github_full_name, branch, baseSha);
+    } catch (e) {
+      if (!String(e).includes("already exists") && !String(e).includes("Reference already exists")) throw e;
+    }
+
+    // Build markdown report
+    const bySev = (findings ?? []).reduce<Record<string, typeof findings>>((acc, f) => {
+      (acc[f.severity] ||= [] as unknown as typeof findings)!.push(f); return acc;
+    }, {});
+    const sevOrder = ["critical", "high", "medium", "low", "info"];
+    const md: string[] = [
+      `# 🛡️ Sentinel Analysis Report`,
+      ``,
+      `**Summary:** ${analysis.summary ?? "(no summary)"}`,
+      `**Findings:** ${(findings ?? []).length} · **Generated tests:** ${(tests ?? []).length}`,
+      ``,
+    ];
+    for (const sev of sevOrder) {
+      const list = bySev[sev]; if (!list?.length) continue;
+      md.push(`## ${sev.toUpperCase()} (${list.length})`);
+      for (const f of list) {
+        md.push(`- **[${f.agent}]** ${f.title}${f.file_path ? ` — \`${f.file_path}\`` : ""}`);
+        if (f.detail) md.push(`  > ${String(f.detail).replace(/\n/g, "\n  > ").slice(0, 500)}`);
+      }
+      md.push("");
+    }
+    const reportPath = `.sentinel/analysis-${data.analysisId.slice(0, 8)}.md`;
+    await putFileOnBranch(token, repo.github_full_name, branch, reportPath, md.join("\n"),
+      "chore(sentinel): add analysis report");
+
+    // Commit generated tests
+    for (const t of tests ?? []) {
+      const src = t.source_file.replace(/\.(ts|tsx|js|jsx)$/, "");
+      const ext = /\.(tsx|jsx)$/.test(t.source_file) ? "test.tsx" : t.language === "typescript" ? "test.ts" : "test.js";
+      const testPath = `${src}.sentinel.${ext}`;
+      try {
+        await putFileOnBranch(token, repo.github_full_name, branch, testPath, t.test_code,
+          `test(sentinel): add generated tests for ${t.source_file}`);
+      } catch (e) { console.error("skip test file", testPath, e); }
+    }
+
+    // Open PR
+    const prBody = [
+      `Automated report from **Sentinel** for analysis \`${data.analysisId}\`.`,
+      ``,
+      `See [\`${reportPath}\`](../blob/${branch}/${reportPath}) for the full breakdown.`,
+      ``,
+      md.slice(0, 40).join("\n"),
+    ].join("\n");
+
+    const pr = await createPullRequest(token, repo.github_full_name, {
+      title: `🛡️ Sentinel: ${(findings ?? []).length} findings · ${(tests ?? []).length} tests`,
+      head: branch, base, body: prBody,
+    });
+
+    // Autonomous comment (top findings)
+    const top = (findings ?? []).filter((f) => ["critical", "high"].includes(f.severity)).slice(0, 10);
+    if (top.length) {
+      const comment = [`### 🚨 Top ${top.length} high-severity findings`, ``,
+        ...top.map((f) => `- **[${f.agent}]** ${f.title}${f.file_path ? ` — \`${f.file_path}\`` : ""}`)].join("\n");
+      try { await createIssueComment(token, repo.github_full_name, pr.number, comment); }
+      catch (e) { console.error("comment failed", e); }
+    }
+
+    return { url: pr.html_url, number: pr.number };
+  });
+
