@@ -36,6 +36,13 @@ const AGENT_META: Record<string, { icon: React.ReactNode; label: string }> = {
 function AnalysisPage() {
   const { id } = Route.useParams();
   const q = useQuery({ queryKey: ["analysis", id], queryFn: () => getAnalysis({ data: { id } }) });
+  const pr = useMutation({
+    mutationFn: () => createAnalysisPR({ data: { analysisId: id } }),
+    onSuccess: (r) => toast.success(`PR #${r.number} opened`, {
+      action: { label: "Open", onClick: () => window.open(r.url, "_blank") },
+    }),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to create PR"),
+  });
 
   if (q.isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
   if (!q.data?.analysis) return <p>Not found.</p>;
@@ -48,13 +55,26 @@ function AnalysisPage() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
       <div className="space-y-6">
-        <div>
-          <div className="text-xs font-mono text-muted-foreground uppercase">Analysis</div>
-          <h1 className="text-2xl font-bold mt-1">
-            {(analysis as unknown as { repos?: { github_full_name: string } }).repos?.github_full_name}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">{analysis.summary}</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <div className="text-xs font-mono text-muted-foreground uppercase">Analysis</div>
+            <h1 className="text-2xl font-bold mt-1">
+              {(analysis as unknown as { repos?: { github_full_name: string } }).repos?.github_full_name}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">{analysis.summary}</p>
+          </div>
+          <button onClick={() => pr.mutate()} disabled={pr.isPending}
+            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50 shadow-lg shadow-primary/20 whitespace-nowrap">
+            {pr.isPending ? <>Opening PR…</> : <><GitPullRequest className="h-4 w-4" /> Open PR on GitHub</>}
+          </button>
         </div>
+        {pr.data && (
+          <a href={pr.data.url} target="_blank" rel="noopener"
+            className="glass rounded-lg p-3 flex items-center justify-between text-sm hover:border-primary/50">
+            <span>PR #{pr.data.number} opened with report, generated tests, and top findings comment.</span>
+            <ExternalLink className="h-4 w-4" />
+          </a>
+        )}
 
         {Object.entries(byAgent).map(([agent, list]) => (
           <section key={agent} className="glass rounded-xl p-6">
