@@ -16,6 +16,8 @@ export type Database = {
     Tables: {
       analyses: {
         Row: {
+          commit_message: string | null
+          commit_sha: string | null
           error: string | null
           finished_at: string | null
           id: string
@@ -23,9 +25,12 @@ export type Database = {
           started_at: string
           status: string
           summary: string | null
+          trigger: string
           user_id: string
         }
         Insert: {
+          commit_message?: string | null
+          commit_sha?: string | null
           error?: string | null
           finished_at?: string | null
           id?: string
@@ -33,9 +38,12 @@ export type Database = {
           started_at?: string
           status?: string
           summary?: string | null
+          trigger?: string
           user_id: string
         }
         Update: {
+          commit_message?: string | null
+          commit_sha?: string | null
           error?: string | null
           finished_at?: string | null
           id?: string
@@ -43,6 +51,7 @@ export type Database = {
           started_at?: string
           status?: string
           summary?: string | null
+          trigger?: string
           user_id?: string
         }
         Relationships: [
@@ -240,7 +249,10 @@ export type Database = {
           github_full_name: string
           id: string
           language: string | null
+          last_event_at: string | null
           user_id: string
+          webhook_enabled: boolean
+          webhook_secret: string | null
         }
         Insert: {
           created_at?: string
@@ -249,7 +261,10 @@ export type Database = {
           github_full_name: string
           id?: string
           language?: string | null
+          last_event_at?: string | null
           user_id: string
+          webhook_enabled?: boolean
+          webhook_secret?: string | null
         }
         Update: {
           created_at?: string
@@ -258,7 +273,10 @@ export type Database = {
           github_full_name?: string
           id?: string
           language?: string | null
+          last_event_at?: string | null
           user_id?: string
+          webhook_enabled?: boolean
+          webhook_secret?: string | null
         }
         Relationships: []
       }
