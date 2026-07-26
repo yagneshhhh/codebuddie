@@ -99,6 +99,17 @@ export const runAnalysis = createServerFn({ method: "POST" })
     return executeAnalysis({ userId: context.userId, repoId: data.repoId, trigger: "manual" });
   });
 
+export const listRecentAnalyses = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data } = await context.supabase
+      .from("analyses")
+      .select("id, status, summary, trigger, commit_sha, commit_message, started_at, finished_at, repos(github_full_name)")
+      .order("started_at", { ascending: false })
+      .limit(10);
+    return data ?? [];
+  });
+
 // ── GitHub push webhook configuration ───────────────────────────
 export const getWebhookConfig = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -114,7 +125,6 @@ export const getWebhookConfig = createServerFn({ method: "GET" })
       enabled: repo.webhook_enabled,
       secret: repo.webhook_secret,
       lastEventAt: repo.last_event_at,
-      deliveryUrl: `${process.env.PUBLIC_APP_URL ?? ""}/api/public/github/webhook`,
     };
   });
 

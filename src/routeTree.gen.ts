@@ -17,6 +17,7 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedReposRepoIdRouteImport } from './routes/_authenticated/repos.$repoId'
 import { Route as AuthenticatedAnalysesIdRouteImport } from './routes/_authenticated/analyses.$id'
+import { Route as ApiPublicGithubWebhookRouteImport } from './routes/api/public/github/webhook'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -58,6 +59,11 @@ const AuthenticatedAnalysesIdRoute = AuthenticatedAnalysesIdRouteImport.update({
   path: '/analyses/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicGithubWebhookRoute = ApiPublicGithubWebhookRouteImport.update({
+  id: '/api/public/github/webhook',
+  path: '/api/public/github/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -67,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/analyses/$id': typeof AuthenticatedAnalysesIdRoute
   '/repos/$repoId': typeof AuthenticatedReposRepoIdRoute
+  '/api/public/github/webhook': typeof ApiPublicGithubWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/analyses/$id': typeof AuthenticatedAnalysesIdRoute
   '/repos/$repoId': typeof AuthenticatedReposRepoIdRoute
+  '/api/public/github/webhook': typeof ApiPublicGithubWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/_authenticated/analyses/$id': typeof AuthenticatedAnalysesIdRoute
   '/_authenticated/repos/$repoId': typeof AuthenticatedReposRepoIdRoute
+  '/api/public/github/webhook': typeof ApiPublicGithubWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/analyses/$id'
     | '/repos/$repoId'
+    | '/api/public/github/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/analyses/$id'
     | '/repos/$repoId'
+    | '/api/public/github/webhook'
   id:
     | '__root__'
     | '/'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/_authenticated/analyses/$id'
     | '/_authenticated/repos/$repoId'
+    | '/api/public/github/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -125,6 +137,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiPublicGithubWebhookRoute: typeof ApiPublicGithubWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalysesIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/github/webhook': {
+      id: '/api/public/github/webhook'
+      path: '/api/public/github/webhook'
+      fullPath: '/api/public/github/webhook'
+      preLoaderRoute: typeof ApiPublicGithubWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -209,6 +229,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiPublicGithubWebhookRoute: ApiPublicGithubWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
