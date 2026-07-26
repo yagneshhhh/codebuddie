@@ -99,3 +99,79 @@ function RepoPage() {
     </div>
   );
 }
+
+function WebhookPanel({ repoId, fullName, branch }: { repoId: string; fullName: string; branch: string }) {
+  const cfg = useQuery({ queryKey: ["webhook", repoId], queryFn: () => getWebhookConfig({ data: { repoId } }) });
+  const save = useMutation({
+    mutationFn: (v: { enabled: boolean; rotate?: boolean }) => setWebhook({ data: { repoId, ...v } }),
+    onSuccess: () => { toast.success("Webhook settings saved"); cfg.refetch(); },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const url = typeof window !== "undefined" ? `${window.location.origin}/api/public/github/webhook` : "";
+  const copy = (v: string, label: string) => {
+    navigator.clipboard.writeText(v).then(() => toast.success(`${label} copied`));
+  };
+
+  return (
+    <section className="glass rounded-xl p-6 space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Webhook className="h-4 w-4" />
+          <h2 className="font-semibold">Auto-analyse on push</h2>
+        </div>
+        <button
+          onClick={() => save.mutate({ enabled: !cfg.data?.enabled })}
+          disabled={save.isPending || cfg.isLoading}
+          className={`rounded-md px-4 py-2 text-sm font-semibold disabled:opacity-50 ${
+            cfg.data?.enabled ? "bg-card border border-border" : "bg-primary text-primary-foreground"
+          }`}>
+          {cfg.data?.enabled ? "Disable" : "Enable webhook"}
+        </button>
+      </div>
+
+      {cfg.data?.enabled ? (
+        <div className="space-y-3 text-sm">
+          <p className="text-muted-foreground">
+            Add this webhook in GitHub → <span className="font-mono">{fullName}</span> → Settings → Webhooks →
+            Add webhook. Content type <span className="font-mono">application/json</span>, event{" "}
+            <span className="font-mono">Just the push event</span>. Pushes to{" "}
+            <span className="font-mono text-accent">{branch}</span> start an analysis automatically.
+          </p>
+          <Field label="Payload URL" value={url} onCopy={() => copy(url, "URL")} />
+          <Field label="Secret" value={cfg.data.secret ?? ""} mono onCopy={() => copy(cfg.data!.secret ?? "", "Secret")} />
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>
+              Last push received:{" "}
+              {cfg.data.lastEventAt ? new Date(cfg.data.lastEventAt).toLocaleString() : "never"}
+            </span>
+            <button onClick={() => save.mutate({ enabled: true, rotate: true })}
+              className="inline-flex items-center gap-1 hover:text-foreground">
+              <RefreshCw className="h-3 w-3" /> Rotate secret
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          Enable to get a signed webhook endpoint — every push to{" "}
+          <span className="font-mono text-accent">{branch}</span> then dispatches the agents automatically.
+        </p>
+      )}
+    </section>
+  );
+}
+
+function Field({ label, value, mono, onCopy }: { label: string; value: string; mono?: boolean; onCopy: () => void }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground mb-1">{label}</div>
+      <div className="flex gap-2">
+        <input readOnly value={value}
+          className={`flex-1 rounded-md bg-input px-3 py-2 text-xs outline-none ${mono ? "font-mono" : ""}`} />
+        <button onClick={onCopy} className="rounded-md border border-border px-3 text-muted-foreground hover:text-foreground">
+          <Copy className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    </div>
+  );
+}
