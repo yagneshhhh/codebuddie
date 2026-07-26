@@ -64,6 +64,8 @@ function RepoPage() {
         </div>
       )}
 
+      <WebhookPanel repoId={repoId} fullName={repo.github_full_name} branch={repo.default_branch} />
+
       <section>
         <h2 className="font-semibold mb-3">History</h2>
         {analyses.length === 0 ? (
@@ -76,9 +78,14 @@ function RepoPage() {
                 <div>
                   <div className="text-sm">{a.summary || (a.status === "failed" ? "Failed" : "Running…")}</div>
                   <div className="text-xs text-muted-foreground font-mono mt-1">
+                    <span className="uppercase mr-2">{(a as { trigger?: string }).trigger === "push" ? "push" : "manual"}</span>
+                    {(a as { commit_sha?: string | null }).commit_sha
+                      ? <span className="mr-2 text-accent">{(a as { commit_sha?: string | null }).commit_sha!.slice(0, 7)}</span>
+                      : null}
                     {new Date(a.started_at).toLocaleString()}
                   </div>
                 </div>
+
                 <span className={`text-xs font-mono uppercase px-2 py-1 rounded ${
                   a.status === "done" ? "bg-success/20 text-success"
                     : a.status === "failed" ? "bg-destructive/20 text-destructive"
