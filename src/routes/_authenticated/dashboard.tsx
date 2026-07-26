@@ -2,10 +2,10 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Github, Plus, Trash2, FolderGit2 } from "lucide-react";
+import { Github, Plus, Trash2, FolderGit2, Activity } from "lucide-react";
 import {
   getGithubStatus, saveGithubToken, disconnectGithub,
-  listMyGithubRepos, addRepo, listRepos,
+  listMyGithubRepos, addRepo, listRepos, listRecentAnalyses,
 } from "@/lib/api.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -49,6 +49,8 @@ function Dashboard() {
         </section>
       )}
 
+      <JobStatus />
+
       <section>
         <h2 className="font-semibold mb-4 flex items-center gap-2"><FolderGit2 className="h-4 w-4" /> Your repositories</h2>
         {myRepos.data && myRepos.data.length > 0 ? (
@@ -69,6 +71,51 @@ function Dashboard() {
         )}
       </section>
     </div>
+  );
+}
+
+function JobStatus() {
+  const q = useQuery({
+    queryKey: ["recent-analyses"],
+    queryFn: () => listRecentAnalyses(),
+    // Poll faster while something is still running (e.g. a push-triggered job).
+    refetchInterval: (query) =>
+      query.state.data?.some((a) => a.status === "running") ? 5000 : 20000,
+  });
+  const rows = q.data ?? [];
+  return (
+    <section>
+      <h2 className="font-semibold mb-4 flex items-center gap-2"><Activity className="h-4 w-4" /> Job status</h2>
+      {rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No analysis jobs yet.</p>
+      ) : (
+        <div className="space-y-2">
+          {rows.map((a) => (
+            <Link key={a.id} to="/analyses/$id" params={{ id: a.id }}
+              className="glass rounded-lg p-3 flex items-center justify-between gap-3 hover:border-primary/50">
+              <div className="min-w-0">
+                <div className="font-mono text-sm truncate">
+                  {(a as unknown as { repos?: { github_full_name: string } }).repos?.github_full_name}
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {a.summary || (a.status === "failed" ? "Failed" : "Agents running…")}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                  {a.trigger === "push" ? "push" : "manual"}
+                </span>
+                <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded ${
+                  a.status === "done" ? "bg-success/20 text-success"
+                    : a.status === "failed" ? "bg-destructive/20 text-destructive"
+                    : "bg-warning/20 text-warning animate-pulse"
+                }`}>{a.status}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }
 
