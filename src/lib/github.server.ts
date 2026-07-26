@@ -13,7 +13,23 @@ async function gh<T = unknown>(token: string, path: string, init?: RequestInit):
       ...(init?.headers ?? {}),
     },
   });
-  if (!res.ok) throw new Error(`GitHub ${path} → ${res.status}: ${await res.text()}`);
+  if (!res.ok) {
+    const body = await res.text();
+    if (res.status === 403 && /not accessible by personal access token/i.test(body)) {
+      throw new Error(
+        "Your GitHub token can't write to this repository. Opening a PR needs write access: " +
+          "for a fine-grained token, grant this repo Repository permissions → Contents: Read and write, " +
+          "Pull requests: Read and write, and Issues: Read and write. " +
+          "For a classic token, enable the full `repo` scope. Then reconnect GitHub in Settings.",
+      );
+    }
+    if (res.status === 404) {
+      throw new Error(
+        `GitHub returned 404 for ${path}. The token may not have access to this repository (fine-grained tokens must explicitly select it).`,
+      );
+    }
+    throw new Error(`GitHub ${path} → ${res.status}: ${body}`);
+  }
   return (await res.json()) as T;
 }
 
