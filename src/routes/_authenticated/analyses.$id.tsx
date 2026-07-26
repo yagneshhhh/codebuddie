@@ -38,11 +38,15 @@ function AnalysisPage() {
   const q = useQuery({ queryKey: ["analysis", id], queryFn: () => getAnalysis({ data: { id } }) });
   const pr = useMutation({
     mutationFn: () => createAnalysisPR({ data: { analysisId: id } }),
-    onSuccess: (r) => toast.success(`PR #${r.number} opened`, {
-      action: { label: "Open", onClick: () => window.open(r.url, "_blank") },
-    }),
+    onSuccess: (r) => {
+      if (!r.ok) { toast.error(r.error); return; }
+      toast.success(`PR #${r.number} opened`, {
+        action: { label: "Open", onClick: () => window.open(r.url, "_blank") },
+      });
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to create PR"),
   });
+
 
   if (q.isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
   if (!q.data?.analysis) return <p>Not found.</p>;
