@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Play, ExternalLink } from "lucide-react";
-import { getRepo, runAnalysis } from "@/lib/api.functions";
+import { Play, ExternalLink, Webhook, Copy, RefreshCw } from "lucide-react";
+import { getRepo, runAnalysis, getWebhookConfig, setWebhook } from "@/lib/api.functions";
 
 export const Route = createFileRoute("/_authenticated/repos/$repoId")({
   head: ({ params }) => ({
@@ -19,7 +19,13 @@ export const Route = createFileRoute("/_authenticated/repos/$repoId")({
 function RepoPage() {
   const { repoId } = Route.useParams();
   const navigate = useNavigate();
-  const q = useQuery({ queryKey: ["repo", repoId], queryFn: () => getRepo({ data: { id: repoId } }) });
+  const q = useQuery({
+    queryKey: ["repo", repoId],
+    queryFn: () => getRepo({ data: { id: repoId } }),
+    // Poll while a webhook-triggered analysis is still running.
+    refetchInterval: (query) =>
+      query.state.data?.analyses?.some((a) => a.status === "running") ? 5000 : 15000,
+  });
   const run = useMutation({
     mutationFn: () => runAnalysis({ data: { repoId } }),
     onSuccess: (r) => { toast.success("Analysis complete"); navigate({ to: "/analyses/$id", params: { id: r.id } }); },
@@ -29,6 +35,7 @@ function RepoPage() {
   if (q.isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
   if (!q.data?.repo) return <p>Not found.</p>;
   const { repo, analyses } = q.data;
+
 
   return (
     <div className="space-y-6">
