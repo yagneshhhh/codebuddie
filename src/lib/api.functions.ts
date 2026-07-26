@@ -215,6 +215,7 @@ export const createAnalysisPR = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ analysisId: z.string() }).parse(i))
   .handler(async ({ data, context }) => {
+    try {
     const { getBranchSha, createBranch, putFileOnBranch, createPullRequest, createIssueComment } =
       await import("@/lib/github.server");
 
@@ -298,6 +299,13 @@ export const createAnalysisPR = createServerFn({ method: "POST" })
       catch (e) { console.error("comment failed", e); }
     }
 
-    return { url: pr.html_url, number: pr.number };
+    return { ok: true as const, url: pr.html_url, number: pr.number };
+    } catch (e) {
+      // Surface GitHub permission/API problems as a normal result instead of an
+      // unhandled server error (which blanks the page).
+      const message = e instanceof Error ? e.message : "Failed to create the pull request.";
+      console.error("createAnalysisPR failed", message);
+      return { ok: false as const, error: message };
+    }
   });
 
