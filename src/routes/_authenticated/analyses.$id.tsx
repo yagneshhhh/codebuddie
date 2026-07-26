@@ -38,11 +38,15 @@ function AnalysisPage() {
   const q = useQuery({ queryKey: ["analysis", id], queryFn: () => getAnalysis({ data: { id } }) });
   const pr = useMutation({
     mutationFn: () => createAnalysisPR({ data: { analysisId: id } }),
-    onSuccess: (r) => toast.success(`PR #${r.number} opened`, {
-      action: { label: "Open", onClick: () => window.open(r.url, "_blank") },
-    }),
+    onSuccess: (r) => {
+      if (!r.ok) { toast.error(r.error); return; }
+      toast.success(`PR #${r.number} opened`, {
+        action: { label: "Open", onClick: () => window.open(r.url, "_blank") },
+      });
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to create PR"),
   });
+
 
   if (q.isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
   if (!q.data?.analysis) return <p>Not found.</p>;
@@ -68,13 +72,17 @@ function AnalysisPage() {
             {pr.isPending ? <>Opening PR…</> : <><GitPullRequest className="h-4 w-4" /> Open PR on GitHub</>}
           </button>
         </div>
-        {pr.data && (
+        {pr.data?.ok === false && (
+          <div className="glass rounded-lg p-3 text-sm border-destructive/50 text-destructive">{pr.data.error}</div>
+        )}
+        {pr.data?.ok && (
           <a href={pr.data.url} target="_blank" rel="noopener"
             className="glass rounded-lg p-3 flex items-center justify-between text-sm hover:border-primary/50">
             <span>PR #{pr.data.number} opened with report, generated tests, and top findings comment.</span>
             <ExternalLink className="h-4 w-4" />
           </a>
         )}
+
 
         {Object.entries(byAgent).map(([agent, list]) => (
           <section key={agent} className="glass rounded-xl p-6">
