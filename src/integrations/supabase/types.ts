@@ -16,6 +16,8 @@ export type Database = {
     Tables: {
       analyses: {
         Row: {
+          agent_status: Json | null
+          attempt: number
           commit_message: string | null
           commit_sha: string | null
           error: string | null
@@ -29,6 +31,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          agent_status?: Json | null
+          attempt?: number
           commit_message?: string | null
           commit_sha?: string | null
           error?: string | null
@@ -42,6 +46,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          agent_status?: Json | null
+          attempt?: number
           commit_message?: string | null
           commit_sha?: string | null
           error?: string | null
@@ -219,6 +225,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      job_events: {
+        Row: {
+          agent: string | null
+          analysis_id: string
+          attempt: number
+          created_at: string
+          duration_ms: number | null
+          id: string
+          message: string | null
+          status: string
+          step: string
+          user_id: string
+        }
+        Insert: {
+          agent?: string | null
+          analysis_id: string
+          attempt?: number
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          message?: string | null
+          status?: string
+          step: string
+          user_id: string
+        }
+        Update: {
+          agent?: string | null
+          analysis_id?: string
+          attempt?: number
+          created_at?: string
+          duration_ms?: number | null
+          id?: string
+          message?: string | null
+          status?: string
+          step?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_events_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
