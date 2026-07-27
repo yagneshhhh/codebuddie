@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Package, ShieldCheck, TestTube2, MessageSquare, Send, GitPullRequest, ExternalLink } from "lucide-react";
-import { getAnalysis, createAnalysisPR } from "@/lib/api.functions";
+import {
+  Package, ShieldCheck, TestTube2, MessageSquare, Send, GitPullRequest, ExternalLink,
+  RefreshCw, CheckCircle2, XCircle, Loader2, Activity,
+} from "lucide-react";
+import { getAnalysis, createAnalysisPR, retryAnalysisFn, getJobEvents } from "@/lib/api.functions";
+
 
 
 export const Route = createFileRoute("/_authenticated/analyses/$id")({
@@ -33,9 +37,30 @@ const AGENT_META: Record<string, { icon: React.ReactNode; label: string }> = {
   test_coverage: { icon: <TestTube2 className="h-4 w-4" />, label: "Test Coverage" },
 };
 
+const STATE_ICON: Record<string, React.ReactNode> = {
+  running: <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />,
+  retry: <RefreshCw className="h-3.5 w-3.5 text-warning" />,
+  done: <CheckCircle2 className="h-3.5 w-3.5 text-accent" />,
+  failed: <XCircle className="h-3.5 w-3.5 text-destructive" />,
+  info: <Activity className="h-3.5 w-3.5 text-muted-foreground" />,
+  pending: <Activity className="h-3.5 w-3.5 text-muted-foreground" />,
+};
+
 function AnalysisPage() {
   const { id } = Route.useParams();
-  const q = useQuery({ queryKey: ["analysis", id], queryFn: () => getAnalysis({ data: { id } }) });
+  const qc = useQueryClient();
+  const q = useQuery({
+    queryKey: ["analysis", id],
+    queryFn: () => getAnalysis({ data: { id } }),
+    refetchInterval: (query) =>
+      query.state.data?.analysis?.status === "running" ? 4000 : false,
+  });
+  const running = q.data?.analysis?.status === "running";
+  const events = useQuery({
+    queryKey: ["job-events", id],
+    queryFn: () => getJobEvents({ data: { analysisId: id } }),
+    refetchInterval: running ? 4000 : false,
+  });
   const pr = useMutation({
     mutationFn: () => createAnalysisPR({ data: { analysisId: id } }),
     onSuccess: (r) => {
@@ -46,11 +71,23 @@ function AnalysisPage() {
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed to create PR"),
   });
+  const retry = useMutation({
+    mutationFn: (all: boolean) => retryAnalysisFn({ data: { analysisId: id, all } }),
+    onSuccess: (r) => {
+      if (!r.ok) { toast.error(r.error); return; }
+      toast.success(`Re-run finished — ${r.status}`);
+      qc.invalidateQueries({ queryKey: ["analysis", id] });
+      qc.invalidateQueries({ queryKey: ["job-events", id] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Retry failed"),
+  });
 
 
   if (q.isLoading) return <p className="text-sm text-muted-foreground">Loading…</p>;
   if (!q.data?.analysis) return <p>Not found.</p>;
   const { analysis, findings, tests } = q.data;
+  const agentStatus = (analysis.agent_status ?? {}) as Record<string, string>;
+  const hasFailure = analysis.status === "failed" || analysis.status === "partial";
 
   const byAgent = findings.reduce<Record<string, typeof findings>>((acc, f) => {
     (acc[f.agent] ||= []).push(f); return acc;
@@ -61,17 +98,30 @@ function AnalysisPage() {
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs font-mono text-muted-foreground uppercase">Analysis</div>
+            <div className="text-xs font-mono text-muted-foreground uppercase">
+              Analysis · {analysis.status}{analysis.attempt > 1 ? ` · attempt ${analysis.attempt}` : ""}
+            </div>
             <h1 className="text-2xl font-bold mt-1">
               {(analysis as unknown as { repos?: { github_full_name: string } }).repos?.github_full_name}
             </h1>
             <p className="text-sm text-muted-foreground mt-1">{analysis.summary}</p>
           </div>
-          <button onClick={() => pr.mutate()} disabled={pr.isPending}
-            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50 shadow-lg shadow-primary/20 whitespace-nowrap">
-            {pr.isPending ? <>Opening PR…</> : <><GitPullRequest className="h-4 w-4" /> Open PR on GitHub</>}
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => retry.mutate(!hasFailure)} disabled={retry.isPending || running}
+              className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-semibold disabled:opacity-50 whitespace-nowrap hover:border-primary/50">
+              <RefreshCw className={`h-4 w-4 ${retry.isPending ? "animate-spin" : ""}`} />
+              {hasFailure ? "Retry failed agents" : "Re-run"}
+            </button>
+            <button onClick={() => pr.mutate()} disabled={pr.isPending}
+              className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-50 shadow-lg shadow-primary/20 whitespace-nowrap">
+              {pr.isPending ? <>Opening PR…</> : <><GitPullRequest className="h-4 w-4" /> Open PR on GitHub</>}
+            </button>
+          </div>
         </div>
+
+        {analysis.error && (
+          <div className="glass rounded-lg p-3 text-sm border-destructive/50 text-destructive">{analysis.error}</div>
+        )}
         {pr.data?.ok === false && (
           <div className="glass rounded-lg p-3 text-sm border-destructive/50 text-destructive">{pr.data.error}</div>
         )}
@@ -82,6 +132,43 @@ function AnalysisPage() {
             <ExternalLink className="h-4 w-4" />
           </a>
         )}
+
+        {/* ── Orchestration: agent pipeline + step timeline ── */}
+        <section className="glass rounded-xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Activity className="h-4 w-4" />
+            <h2 className="font-semibold">Orchestration</h2>
+            {running && <span className="text-xs font-mono text-primary">live</span>}
+          </div>
+          <div className="grid gap-2 sm:grid-cols-3 mb-4">
+            {Object.keys(AGENT_META).map((a) => {
+              const st = running && !agentStatus[a] ? "running" : (agentStatus[a] ?? "pending");
+              return (
+                <div key={a} className="flex items-center gap-2 rounded-lg border border-border p-3 text-sm">
+                  {STATE_ICON[st] ?? STATE_ICON.pending}
+                  <span className="flex-1">{AGENT_META[a].label}</span>
+                  <span className="text-[10px] font-mono uppercase text-muted-foreground">{st}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="max-h-64 overflow-y-auto space-y-1">
+            {(events.data ?? []).length === 0 && (
+              <p className="text-xs text-muted-foreground">No step events recorded for this run.</p>
+            )}
+            {(events.data ?? []).map((e) => (
+              <div key={e.id} className="flex items-start gap-2 text-xs font-mono border-l-2 border-border pl-3 py-1">
+                {STATE_ICON[e.status] ?? STATE_ICON.info}
+                <span className="text-foreground">{e.step}</span>
+                {e.attempt > 1 && <span className="text-warning">#{e.attempt}</span>}
+                {e.duration_ms != null && <span className="text-muted-foreground">{e.duration_ms}ms</span>}
+                {e.message && <span className="text-muted-foreground flex-1 truncate">{e.message}</span>}
+              </div>
+            ))}
+          </div>
+        </section>
+
+
 
 
         {Object.entries(byAgent).map(([agent, list]) => (

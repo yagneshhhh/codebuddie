@@ -99,16 +99,50 @@ export const runAnalysis = createServerFn({ method: "POST" })
     return executeAnalysis({ userId: context.userId, repoId: data.repoId, trigger: "manual" });
   });
 
+/** Re-run an analysis — failed agents only by default, or everything with `all`. */
+export const retryAnalysisFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) =>
+    z.object({ analysisId: z.string(), all: z.boolean().optional() }).parse(i),
+  )
+  .handler(async ({ data, context }) => {
+    try {
+      const { retryAnalysis } = await import("@/lib/analysis.server");
+      const r = await retryAnalysis({
+        userId: context.userId, analysisId: data.analysisId, all: data.all,
+      });
+      return { ok: true as const, ...r };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Retry failed";
+      console.error("retryAnalysis failed", message);
+      return { ok: false as const, error: message };
+    }
+  });
+
+/** Orchestration timeline for one analysis. */
+export const getJobEvents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i: unknown) => z.object({ analysisId: z.string() }).parse(i))
+  .handler(async ({ data, context }) => {
+    const { data: events } = await context.supabase
+      .from("job_events")
+      .select("id, agent, step, status, message, duration_ms, attempt, created_at")
+      .eq("analysis_id", data.analysisId)
+      .order("created_at", { ascending: true });
+    return events ?? [];
+  });
+
 export const listRecentAnalyses = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data } = await context.supabase
       .from("analyses")
-      .select("id, status, summary, trigger, commit_sha, commit_message, started_at, finished_at, repos(github_full_name)")
+      .select("id, status, summary, trigger, commit_sha, commit_message, started_at, finished_at, attempt, agent_status, repos(github_full_name)")
       .order("started_at", { ascending: false })
       .limit(10);
     return data ?? [];
   });
+
 
 // ── GitHub push webhook configuration ───────────────────────────
 export const getWebhookConfig = createServerFn({ method: "GET" })
