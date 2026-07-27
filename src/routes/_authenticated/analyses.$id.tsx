@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Package, ShieldCheck, TestTube2, MessageSquare, Send, GitPullRequest, ExternalLink } from "lucide-react";
-import { getAnalysis, createAnalysisPR } from "@/lib/api.functions";
+import {
+  Package, ShieldCheck, TestTube2, MessageSquare, Send, GitPullRequest, ExternalLink,
+  RefreshCw, CheckCircle2, XCircle, Loader2, Activity,
+} from "lucide-react";
+import { getAnalysis, createAnalysisPR, retryAnalysisFn, getJobEvents } from "@/lib/api.functions";
+
 
 
 export const Route = createFileRoute("/_authenticated/analyses/$id")({
