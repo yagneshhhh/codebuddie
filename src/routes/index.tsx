@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bot, GitBranch, ShieldCheck, TestTube2, Package, Sparkles } from "lucide-react";
+import { Bot, GitBranch, ShieldCheck, TestTube2, Package } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
