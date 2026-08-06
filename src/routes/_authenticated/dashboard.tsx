@@ -103,7 +103,7 @@ function JobStatus() {
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                  {a.trigger === "push" ? "push" : "manual"}
+                  {a.trigger === "pull_request" ? "PR" : a.trigger === "workflow" ? "CI" : a.trigger === "push" ? "push" : a.trigger === "retry" ? "retry" : "manual"}
                 </span>
                 <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded ${
                   a.status === "done" ? "bg-success/20 text-success"
