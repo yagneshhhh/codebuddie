@@ -8,7 +8,7 @@
 //   • partial success    → run finishes as `done` / `partial` / `failed`
 //   • resumability       → `retryAnalysis` re-runs only what failed
 
-export type AnalysisTrigger = "manual" | "push" | "retry";
+export type AnalysisTrigger = "manual" | "push" | "pull_request" | "workflow" | "retry";
 export type AgentName = "dependency" | "dead_code" | "test_coverage";
 export type AgentState = "pending" | "running" | "done" | "failed";
 
@@ -84,6 +84,8 @@ export async function executeAnalysis(opts: {
   trigger?: AnalysisTrigger;
   commitSha?: string | null;
   commitMessage?: string | null;
+  /** Analyse a specific branch instead of the repo default (e.g. a PR head branch). */
+  ref?: string | null;
   /** Re-use an existing analysis row instead of creating a new one (retry path). */
   analysisId?: string;
   /** Restrict the run to a subset of agents (retry path). */
@@ -157,14 +159,15 @@ export async function executeAnalysis(opts: {
     // ── Fetch repo tree (hard dependency for every agent) ────────
     const treeStart = Date.now();
     await logEvent(supabaseAdmin, { ...ctx, step: "fetch:tree", status: "running", attempt: runAttempt });
-    const tree = await getRepoTree(token, repo.github_full_name, repo.default_branch);
+    const targetBranch = opts.ref || repo.default_branch;
+    const tree = await getRepoTree(token, repo.github_full_name, targetBranch);
     await logEvent(supabaseAdmin, {
       ...ctx, step: "fetch:tree", status: "done", durationMs: Date.now() - treeStart,
-      message: `${tree.length} files`, attempt: runAttempt,
+      message: `${tree.length} files · ${targetBranch}`, attempt: runAttempt,
     });
 
     const full = repo.github_full_name;
-    const branch = repo.default_branch;
+    const branch = targetBranch;
 
     // ── Fan out agents in parallel, each independently retried ───
     const [depRes, deadRes, covRes] = await Promise.all([
@@ -234,7 +237,7 @@ export async function executeAnalysis(opts: {
       .slice(0, 8);
     const raws = await Promise.all(codeFiles.map(async (f) => ({
       path: f.path,
-      raw: await getRawFile(token, repo.github_full_name, repo.default_branch, f.path),
+      raw: await getRawFile(token, repo.github_full_name, branch, f.path),
     })));
     for (const { path, raw } of raws) {
       if (!raw) continue;

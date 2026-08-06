@@ -78,7 +78,7 @@ function RepoPage() {
                 <div>
                   <div className="text-sm">{a.summary || (a.status === "failed" ? "Failed" : "Running…")}</div>
                   <div className="text-xs text-muted-foreground font-mono mt-1">
-                    <span className="uppercase mr-2">{(a as { trigger?: string }).trigger === "push" ? "push" : "manual"}</span>
+                    <span className="uppercase mr-2">{{ pull_request: "pr", workflow: "ci", push: "push", retry: "retry" }[(a as { trigger?: string }).trigger ?? ""] ?? "manual"}</span>
                     {(a as { commit_sha?: string | null }).commit_sha
                       ? <span className="mr-2 text-accent">{(a as { commit_sha?: string | null }).commit_sha!.slice(0, 7)}</span>
                       : null}
@@ -118,7 +118,7 @@ function WebhookPanel({ repoId, fullName, branch }: { repoId: string; fullName: 
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Webhook className="h-4 w-4" />
-          <h2 className="font-semibold">Auto-analyse on push</h2>
+          <h2 className="font-semibold">Auto-analyse on repo events</h2>
         </div>
         <button
           onClick={() => save.mutate({ enabled: !cfg.data?.enabled })}
@@ -134,15 +134,21 @@ function WebhookPanel({ repoId, fullName, branch }: { repoId: string; fullName: 
         <div className="space-y-3 text-sm">
           <p className="text-muted-foreground">
             Add this webhook in GitHub → <span className="font-mono">{fullName}</span> → Settings → Webhooks →
-            Add webhook. Content type <span className="font-mono">application/json</span>, event{" "}
-            <span className="font-mono">Just the push event</span>. Pushes to{" "}
-            <span className="font-mono text-accent">{branch}</span> start an analysis automatically.
+            Add webhook. Content type <span className="font-mono">application/json</span>, then choose{" "}
+            <span className="font-mono">Let me select individual events</span> and tick{" "}
+            <span className="font-mono">Pushes</span>, <span className="font-mono">Pull requests</span> and{" "}
+            <span className="font-mono">Workflow runs</span>.
           </p>
+          <ul className="text-xs text-muted-foreground space-y-1 font-mono">
+            <li>· push → analyses <span className="text-accent">{branch}</span></li>
+            <li>· pull_request (opened / reopened / synchronize) → analyses the PR head branch</li>
+            <li>· workflow_run completed with failure → re-analyses the failing branch</li>
+          </ul>
           <Field label="Payload URL" value={url} onCopy={() => copy(url, "URL")} />
           <Field label="Secret" value={cfg.data.secret ?? ""} mono onCopy={() => copy(cfg.data!.secret ?? "", "Secret")} />
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>
-              Last push received:{" "}
+              Last event received:{" "}
               {cfg.data.lastEventAt ? new Date(cfg.data.lastEventAt).toLocaleString() : "never"}
             </span>
             <button onClick={() => save.mutate({ enabled: true, rotate: true })}
@@ -153,8 +159,8 @@ function WebhookPanel({ repoId, fullName, branch }: { repoId: string; fullName: 
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">
-          Enable to get a signed webhook endpoint — every push to{" "}
-          <span className="font-mono text-accent">{branch}</span> then dispatches the agents automatically.
+          Enable to get a signed webhook endpoint — pushes, pull requests and failing CI runs on{" "}
+          <span className="font-mono text-accent">{branch}</span> and PR branches then dispatch the agents automatically.
         </p>
       )}
     </section>
