@@ -215,7 +215,7 @@ export const createAnalysisPR = createServerFn({ method: "POST" })
 
     const token = await getToken(context.userId);
     const base = repo.default_branch || "main";
-    const branch = `sentinel/analysis-${data.analysisId.slice(0, 8)}`;
+    const branch = `codebuddy/analysis-${data.analysisId.slice(0, 8)}`;
 
     // Branch (idempotent: ignore "already exists")
     try {
@@ -231,7 +231,7 @@ export const createAnalysisPR = createServerFn({ method: "POST" })
     }, {});
     const sevOrder = ["critical", "high", "medium", "low", "info"];
     const md: string[] = [
-      `# 🛡️ Sentinel Analysis Report`,
+      `# 🛡️ CodeBuddy Analysis Report`,
       ``,
       `**Summary:** ${analysis.summary ?? "(no summary)"}`,
       `**Findings:** ${(findings ?? []).length} · **Generated tests:** ${(tests ?? []).length}`,
@@ -246,24 +246,24 @@ export const createAnalysisPR = createServerFn({ method: "POST" })
       }
       md.push("");
     }
-    const reportPath = `.sentinel/analysis-${data.analysisId.slice(0, 8)}.md`;
+    const reportPath = `.codebuddy/analysis-${data.analysisId.slice(0, 8)}.md`;
     await putFileOnBranch(token, repo.github_full_name, branch, reportPath, md.join("\n"),
-      "chore(sentinel): add analysis report");
+      "chore(codebuddy): add analysis report");
 
     // Commit generated tests
     for (const t of tests ?? []) {
       const src = t.source_file.replace(/\.(ts|tsx|js|jsx)$/, "");
       const ext = /\.(tsx|jsx)$/.test(t.source_file) ? "test.tsx" : t.language === "typescript" ? "test.ts" : "test.js";
-      const testPath = `${src}.sentinel.${ext}`;
+      const testPath = `${src}.codebuddy.${ext}`;
       try {
         await putFileOnBranch(token, repo.github_full_name, branch, testPath, t.test_code,
-          `test(sentinel): add generated tests for ${t.source_file}`);
+          `test(codebuddy): add generated tests for ${t.source_file}`);
       } catch (e) { console.error("skip test file", testPath, e); }
     }
 
     // Open PR
     const prBody = [
-      `Automated report from **Sentinel** for analysis \`${data.analysisId}\`.`,
+      `Automated report from **CodeBuddy** for analysis \`${data.analysisId}\`.`,
       ``,
       `See [\`${reportPath}\`](../blob/${branch}/${reportPath}) for the full breakdown.`,
       ``,
@@ -271,7 +271,7 @@ export const createAnalysisPR = createServerFn({ method: "POST" })
     ].join("\n");
 
     const pr = await createPullRequest(token, repo.github_full_name, {
-      title: `🛡️ Sentinel: ${(findings ?? []).length} findings · ${(tests ?? []).length} tests`,
+      title: `🛡️ CodeBuddy: ${(findings ?? []).length} findings · ${(tests ?? []).length} tests`,
       head: branch, base, body: prBody,
     });
 

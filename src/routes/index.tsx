@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bot, GitBranch, ShieldCheck, TestTube2, Package, Sparkles } from "lucide-react";
+import { Bot, GitBranch, ShieldCheck, TestTube2, Package } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sentinel — Agentic Codebase Analyzer" },
+      { title: "CodeBuddy — Agentic Codebase Analyzer" },
       { name: "description", content: "Autonomous AI agents that audit your repositories: outdated dependencies, dead code, and missing test coverage — with generated test stubs." },
-      { property: "og:title", content: "Sentinel — Agentic Codebase Analyzer" },
+      { property: "og:title", content: "CodeBuddy — Agentic Codebase Analyzer" },
       { property: "og:description", content: "Autonomous AI agents that audit your GitHub repos for outdated deps, dead code, and coverage gaps." },
       { property: "og:type", content: "website" },
     ],
@@ -23,7 +23,7 @@ function Landing() {
           <div className="h-6 w-6 rounded bg-primary flex items-center justify-center text-primary-foreground">
             <Bot className="h-4 w-4" />
           </div>
-          SENTINEL
+          CODEBUDDY
         </div>
         <Link to="/auth" className="rounded-md border border-border bg-card/50 px-4 py-2 text-sm font-medium hover:bg-card">
           Sign in
@@ -31,14 +31,11 @@ function Landing() {
       </nav>
 
       <section className="relative mx-auto max-w-5xl px-6 pt-20 pb-24 text-center md:px-12">
-        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-3 py-1 text-xs font-mono text-muted-foreground">
-          <Sparkles className="h-3 w-3 text-primary" /> Multi-agent · GitHub-native · Lovable AI
-        </div>
         <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight leading-[1.05]">
           Your codebase, <span className="text-gradient">audited by agents.</span>
         </h1>
         <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
-          Sentinel dispatches specialised AI agents against your GitHub repos — flagging outdated dependencies,
+          CodeBuddy dispatches specialised AI agents against your GitHub repos — flagging outdated dependencies,
           dead code, and untested functions — and drafts the tests you're missing.
         </p>
         <div className="mt-10 flex flex-wrap gap-3 justify-center">
@@ -83,7 +80,7 @@ Dashboard  ·  Chat`}
       </section>
 
       <footer className="relative border-t border-border py-8 text-center text-xs font-mono text-muted-foreground">
-        Sentinel · Built on Lovable
+        CodeBuddy · Built on Lovable
       </footer>
     </div>
   );

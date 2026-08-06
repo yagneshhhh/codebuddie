@@ -53,7 +53,7 @@ export const Route = createFileRoute("/api/chat")({
 
         const result = streamText({
           model: getModel(),
-          system: `You are Sentinel, an AI code auditor. Answer questions about the analysis using ONLY the retrieved context below when possible. Cite file paths and finding titles. Be concise and actionable. If the context is insufficient, say so.\n\n${context}`,
+          system: `You are CodeBuddy, an AI code auditor. Answer questions about the analysis using ONLY the retrieved context below when possible. Cite file paths and finding titles. Be concise and actionable. If the context is insufficient, say so.\n\n${context}`,
           messages: await convertToModelMessages(body.messages),
         });
         return result.toUIMessageStreamResponse({ originalMessages: body.messages });

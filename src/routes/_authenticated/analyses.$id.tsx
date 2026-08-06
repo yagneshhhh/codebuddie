@@ -15,9 +15,9 @@ import { getAnalysis, createAnalysisPR, retryAnalysisFn, getJobEvents } from "@/
 export const Route = createFileRoute("/_authenticated/analyses/$id")({
   head: () => ({
     meta: [
-      { title: "Analysis — Sentinel" },
+      { title: "Analysis — CodeBuddy" },
       { name: "description", content: "Findings and generated tests from your agents." },
-      { property: "og:title", content: "Analysis — Sentinel" },
+      { property: "og:title", content: "Analysis — CodeBuddy" },
       { property: "og:description", content: "Agent findings and tests." },
     ],
   }),

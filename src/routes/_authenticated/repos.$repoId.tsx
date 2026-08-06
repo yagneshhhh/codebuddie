@@ -7,9 +7,9 @@ import { getRepo, runAnalysis, getWebhookConfig, setWebhook } from "@/lib/api.fu
 export const Route = createFileRoute("/_authenticated/repos/$repoId")({
   head: ({ params }) => ({
     meta: [
-      { title: `Repository — Sentinel` },
+      { title: `Repository — CodeBuddy` },
       { name: "description", content: `Analyses for repository ${params.repoId}` },
-      { property: "og:title", content: "Repository — Sentinel" },
+      { property: "og:title", content: "Repository — CodeBuddy" },
       { property: "og:description", content: "Repo analysis history" },
     ],
   }),
