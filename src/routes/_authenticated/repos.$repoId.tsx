@@ -159,8 +159,8 @@ function WebhookPanel({ repoId, fullName, branch }: { repoId: string; fullName: 
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">
-          Enable to get a signed webhook endpoint — every push to{" "}
-          <span className="font-mono text-accent">{branch}</span> then dispatches the agents automatically.
+          Enable to get a signed webhook endpoint — pushes, pull requests and failing CI runs on{" "}
+          <span className="font-mono text-accent">{branch}</span> and PR branches then dispatch the agents automatically.
         </p>
       )}
     </section>
