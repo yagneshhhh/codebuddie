@@ -31,8 +31,6 @@ function Landing() {
       </nav>
 
       <section className="relative mx-auto max-w-5xl px-6 pt-20 pb-24 text-center md:px-12">
-        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/40 px-3 py-1 text-xs font-mono text-muted-foreground">
-        </div>
         <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight leading-[1.05]">
           Your codebase, <span className="text-gradient">audited by agents.</span>
         </h1>
