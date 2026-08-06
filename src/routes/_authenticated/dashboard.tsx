@@ -11,9 +11,9 @@ import {
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Sentinel" },
+      { title: "Dashboard — CodeBuddy" },
       { name: "description", content: "Your connected repositories and recent analyses." },
-      { property: "og:title", content: "Dashboard — Sentinel" },
+      { property: "og:title", content: "Dashboard — CodeBuddy" },
       { property: "og:description", content: "Manage repos and analyses." },
     ],
   }),
@@ -132,7 +132,7 @@ function ConnectForm({ onDone }: { onDone: () => void }) {
         Paste a GitHub Personal Access Token (classic or fine-grained) with <code className="font-mono text-xs bg-code-bg px-1 py-0.5 rounded">repo</code> read scope.
         Stored encrypted, never exposed to the browser.
       </p>
-      <a href="https://github.com/settings/tokens/new?scopes=repo&description=Sentinel" target="_blank" rel="noopener"
+      <a href="https://github.com/settings/tokens/new?scopes=repo&description=CodeBuddy" target="_blank" rel="noopener"
          className="text-xs text-primary underline">Generate a token →</a>
       <div className="flex gap-2">
         <input type="password" placeholder="ghp_…" value={token} onChange={(e) => setToken(e.target.value)}

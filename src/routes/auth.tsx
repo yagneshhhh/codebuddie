@@ -8,10 +8,10 @@ import { lovable } from "@/integrations/lovable";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Sentinel" },
-      { name: "description", content: "Sign in to Sentinel to run agentic audits on your codebase." },
-      { property: "og:title", content: "Sign in — Sentinel" },
-      { property: "og:description", content: "Sign in to Sentinel." },
+      { title: "Sign in — CodeBuddy" },
+      { name: "description", content: "Sign in to CodeBuddy to run agentic audits on your codebase." },
+      { property: "og:title", content: "Sign in — CodeBuddy" },
+      { property: "og:description", content: "Sign in to CodeBuddy." },
     ],
   }),
   component: AuthPage,
@@ -64,7 +64,7 @@ function AuthPage() {
           <div className="h-8 w-8 rounded bg-primary flex items-center justify-center text-primary-foreground">
             <Bot className="h-4 w-4" />
           </div>
-          <span className="font-mono font-bold">SENTINEL</span>
+          <span className="font-mono font-bold">CODEBUDDY</span>
         </div>
         <h1 className="text-2xl font-bold">{mode === "signin" ? "Welcome back" : "Create your account"}</h1>
         <p className="mt-1 text-sm text-muted-foreground">Sign in to run analyses on your repos.</p>

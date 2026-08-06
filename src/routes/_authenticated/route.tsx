@@ -26,7 +26,7 @@ function AuthedLayout() {
             <div className="h-6 w-6 rounded bg-primary flex items-center justify-center text-primary-foreground">
               <Bot className="h-4 w-4" />
             </div>
-            SENTINEL
+            CODEBUDDY
           </Link>
           <button onClick={signOut} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
             <LogOut className="h-3.5 w-3.5" /> Sign out
