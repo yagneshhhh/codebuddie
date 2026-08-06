@@ -8,7 +8,7 @@
 //   • partial success    → run finishes as `done` / `partial` / `failed`
 //   • resumability       → `retryAnalysis` re-runs only what failed
 
-export type AnalysisTrigger = "manual" | "push" | "retry";
+export type AnalysisTrigger = "manual" | "push" | "pull_request" | "workflow" | "retry";
 export type AgentName = "dependency" | "dead_code" | "test_coverage";
 export type AgentState = "pending" | "running" | "done" | "failed";
 
@@ -84,6 +84,8 @@ export async function executeAnalysis(opts: {
   trigger?: AnalysisTrigger;
   commitSha?: string | null;
   commitMessage?: string | null;
+  /** Analyse a specific branch instead of the repo default (e.g. a PR head branch). */
+  ref?: string | null;
   /** Re-use an existing analysis row instead of creating a new one (retry path). */
   analysisId?: string;
   /** Restrict the run to a subset of agents (retry path). */
