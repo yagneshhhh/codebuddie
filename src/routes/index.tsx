@@ -52,13 +52,13 @@ function Landing() {
       <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
 
       <nav className="relative flex items-center justify-between px-6 py-5 md:px-12">
-        <div className="flex items-center gap-2 font-mono text-sm font-bold">
-          <div className="h-6 w-6 rounded bg-primary flex items-center justify-center text-primary-foreground">
+        <div className="flex items-center gap-2 font-mono text-sm font-bold text-white">
+          <div className="h-6 w-6 rounded bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white">
             <Bot className="h-4 w-4" />
           </div>
           CODEBUDDY
         </div>
-        <Link to="/auth" className="rounded-md border border-border bg-card/50 px-4 py-2 text-sm font-medium hover:bg-card">
+        <Link to="/auth" className="rounded-md border border-accent/30 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 transition">
           Sign in
         </Link>
       </nav>
