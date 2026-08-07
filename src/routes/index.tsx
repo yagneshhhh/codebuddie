@@ -25,9 +25,9 @@ function Landing() {
         <ClientOnly fallback={null}>
           <Suspense fallback={null}>
             <GradientWaves
-              horizonColor="#101a2e"
-              waveColor="#2f8f78"
-              crestColor="#6ee7b7"
+              horizonColor="#5227FF"
+              waveColor="#FF9FFC"
+              crestColor="#FFFFFF"
               speed={0.35}
               amplitude={2.5}
               waveScale={0.6}
