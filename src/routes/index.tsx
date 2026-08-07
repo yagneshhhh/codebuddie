@@ -112,7 +112,7 @@ Dashboard  ·  Chat`}
         </div>
       </section>
 
-      <footer className="relative border-t border-border py-8 text-center text-xs font-mono text-muted-foreground">
+      <footer className="relative border-t border-accent/20 py-8 text-center text-xs font-mono text-white/60">
         CodeBuddy · Built on Lovable
       </footer>
     </div>
