@@ -76,12 +76,12 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     background-image:
-      radial-gradient(circle at 20% 10%, oklch(0.25 0.05 260 / 0.5), transparent 40%),
-      radial-gradient(circle at 80% 90%, oklch(0.25 0.06 155 / 0.3), transparent 45%);
+      radial-gradient(circle at 20% 10%, oklch(0.30 0.08 285 / 0.5), transparent 40%),
+      radial-gradient(circle at 80% 90%, oklch(0.30 0.10 350 / 0.3), transparent 45%);
     background-attachment: fixed;
   }
   code, pre, .font-mono { font-family: var(--font-mono); }
-  ::selection { background: oklch(0.78 0.16 155 / 0.35); }
+  ::selection { background: oklch(0.82 0.18 350 / 0.40); }
 }
 
 @utility glass {
