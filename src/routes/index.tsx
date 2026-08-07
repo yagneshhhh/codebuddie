@@ -25,8 +25,8 @@ function Landing() {
         <ClientOnly fallback={null}>
           <Suspense fallback={null}>
             <GradientWaves
-              horizonColor="#0d1117"
-              waveColor="#1e6f5c"
+              horizonColor="#101a2e"
+              waveColor="#2f8f78"
               crestColor="#6ee7b7"
               speed={0.35}
               amplitude={2.5}
@@ -39,8 +39,8 @@ function Landing() {
               height={5.5}
               fogDepth={15}
               detail="medium"
-              brightness={0.9}
-              opacity={0.75}
+              brightness={1.1}
+              opacity={0.9}
               mouseInteraction
               parallaxStrength={0.5}
               grain
