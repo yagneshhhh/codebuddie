@@ -52,30 +52,30 @@ function Landing() {
       <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
 
       <nav className="relative flex items-center justify-between px-6 py-5 md:px-12">
-        <div className="flex items-center gap-2 font-mono text-sm font-bold">
-          <div className="h-6 w-6 rounded bg-primary flex items-center justify-center text-primary-foreground">
+        <div className="flex items-center gap-2 font-mono text-sm font-bold text-white">
+          <div className="h-6 w-6 rounded bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white">
             <Bot className="h-4 w-4" />
           </div>
           CODEBUDDY
         </div>
-        <Link to="/auth" className="rounded-md border border-border bg-card/50 px-4 py-2 text-sm font-medium hover:bg-card">
+        <Link to="/auth" className="rounded-md border border-accent/30 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 transition">
           Sign in
         </Link>
       </nav>
 
       <section className="relative mx-auto max-w-5xl px-6 pt-20 pb-24 text-center md:px-12">
-        <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight leading-[1.05]">
+        <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_20px_oklch(0.82_0.18_350_/_0.35)]">
           Your codebase, <span className="text-gradient">audited by agents.</span>
         </h1>
-        <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto">
           CodeBuddy dispatches specialised AI agents against your GitHub repos — flagging outdated dependencies,
           dead code, and untested functions — and drafts the tests you're missing.
         </p>
         <div className="mt-10 flex flex-wrap gap-3 justify-center">
-          <Link to="/auth" className="rounded-md bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:brightness-110">
+          <Link to="/auth" className="rounded-md bg-gradient-to-r from-primary to-accent px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/40 hover:brightness-110 transition">
             Start analyzing →
           </Link>
-          <a href="#agents" className="rounded-md border border-border bg-card/40 px-6 py-3 font-medium hover:bg-card">
+          <a href="#agents" className="rounded-md border border-accent/30 bg-white/5 px-6 py-3 font-medium text-white hover:bg-white/10 transition">
             Meet the agents
           </a>
         </div>
@@ -91,28 +91,28 @@ function Landing() {
             desc="Finds files without tests and drafts runnable Vitest/pytest stubs you can commit as-is." />
         </div>
 
-        <div className="mt-16 rounded-2xl border border-border glass p-8">
-          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-widest">
+        <div className="mt-16 rounded-2xl border border-accent/20 glass p-8">
+          <div className="flex items-center gap-2 text-xs font-mono text-accent/80 uppercase tracking-widest">
             <GitBranch className="h-3 w-3" /> Orchestration
           </div>
-          <p className="mt-3 text-lg">
+          <p className="mt-3 text-lg text-white/85">
             One trigger → three agents in parallel → structured findings, ranked by severity, streamed to your dashboard.
             Chat with your analysis to dig deeper.
           </p>
-          <pre className="mt-6 overflow-x-auto rounded-lg bg-[color:var(--color-code-bg)] p-4 text-xs text-[color:var(--color-code-fg)]">
+          <pre className="mt-6 overflow-x-auto rounded-lg bg-code-bg p-4 text-xs text-code-fg border border-accent/10">
 {`GitHub Repo
-   ↓
+    ↓
 [ Orchestrator ]
-   ├─▶ Dependency Agent  ─▶ findings
-   ├─▶ Dead-Code Agent   ─▶ findings
-   └─▶ Coverage Agent    ─▶ findings + generated tests
-   ↓
+    ├─▶ Dependency Agent  ─▶ findings
+    ├─▶ Dead-Code Agent   ─▶ findings
+    └─▶ Coverage Agent    ─▶ findings + generated tests
+    ↓
 Dashboard  ·  Chat`}
           </pre>
         </div>
       </section>
 
-      <footer className="relative border-t border-border py-8 text-center text-xs font-mono text-muted-foreground">
+      <footer className="relative border-t border-accent/20 py-8 text-center text-xs font-mono text-white/60">
         CodeBuddy · Built on Lovable
       </footer>
     </div>
@@ -121,11 +121,11 @@ Dashboard  ·  Chat`}
 
 function AgentCard({ icon, name, desc }: { icon: React.ReactNode; name: string; desc: string }) {
   return (
-    <div className="glass rounded-xl p-6 hover:border-primary/40 transition-colors">
-      <div className="inline-flex items-center gap-2 rounded-md bg-primary/10 px-2 py-1 text-primary font-mono text-xs">
+    <div className="glass rounded-xl p-6 hover:border-accent/40 transition-colors">
+      <div className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-primary/20 to-accent/20 px-2 py-1 text-accent font-mono text-xs border border-accent/20">
         {icon} {name}
       </div>
-      <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{desc}</p>
+      <p className="mt-4 text-sm text-white/70 leading-relaxed">{desc}</p>
     </div>
   );
 }
