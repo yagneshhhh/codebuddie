@@ -91,22 +91,22 @@ function Landing() {
             desc="Finds files without tests and drafts runnable Vitest/pytest stubs you can commit as-is." />
         </div>
 
-        <div className="mt-16 rounded-2xl border border-border glass p-8">
-          <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground uppercase tracking-widest">
+        <div className="mt-16 rounded-2xl border border-accent/20 glass p-8">
+          <div className="flex items-center gap-2 text-xs font-mono text-accent/80 uppercase tracking-widest">
             <GitBranch className="h-3 w-3" /> Orchestration
           </div>
-          <p className="mt-3 text-lg">
+          <p className="mt-3 text-lg text-white/85">
             One trigger → three agents in parallel → structured findings, ranked by severity, streamed to your dashboard.
             Chat with your analysis to dig deeper.
           </p>
-          <pre className="mt-6 overflow-x-auto rounded-lg bg-[color:var(--color-code-bg)] p-4 text-xs text-[color:var(--color-code-fg)]">
+          <pre className="mt-6 overflow-x-auto rounded-lg bg-code-bg p-4 text-xs text-code-fg border border-accent/10">
 {`GitHub Repo
-   ↓
+    ↓
 [ Orchestrator ]
-   ├─▶ Dependency Agent  ─▶ findings
-   ├─▶ Dead-Code Agent   ─▶ findings
-   └─▶ Coverage Agent    ─▶ findings + generated tests
-   ↓
+    ├─▶ Dependency Agent  ─▶ findings
+    ├─▶ Dead-Code Agent   ─▶ findings
+    └─▶ Coverage Agent    ─▶ findings + generated tests
+    ↓
 Dashboard  ·  Chat`}
           </pre>
         </div>
