@@ -1,5 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, ClientOnly } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 import { Bot, GitBranch, ShieldCheck, TestTube2, Package } from "lucide-react";
+
+const GradientWaves = lazy(() => import("@/components/GradientWaves"));
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
