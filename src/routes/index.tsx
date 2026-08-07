@@ -121,11 +121,11 @@ Dashboard  ·  Chat`}
 
 function AgentCard({ icon, name, desc }: { icon: React.ReactNode; name: string; desc: string }) {
   return (
-    <div className="glass rounded-xl p-6 hover:border-primary/40 transition-colors">
-      <div className="inline-flex items-center gap-2 rounded-md bg-primary/10 px-2 py-1 text-primary font-mono text-xs">
+    <div className="glass rounded-xl p-6 hover:border-accent/40 transition-colors">
+      <div className="inline-flex items-center gap-2 rounded-md bg-gradient-to-r from-primary/20 to-accent/20 px-2 py-1 text-accent font-mono text-xs border border-accent/20">
         {icon} {name}
       </div>
-      <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{desc}</p>
+      <p className="mt-4 text-sm text-white/70 leading-relaxed">{desc}</p>
     </div>
   );
 }
