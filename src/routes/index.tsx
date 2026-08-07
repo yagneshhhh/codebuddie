@@ -64,18 +64,18 @@ function Landing() {
       </nav>
 
       <section className="relative mx-auto max-w-5xl px-6 pt-20 pb-24 text-center md:px-12">
-        <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight leading-[1.05]">
+        <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] text-white drop-shadow-[0_2px_20px_oklch(0.82_0.18_350_/_0.35)]">
           Your codebase, <span className="text-gradient">audited by agents.</span>
         </h1>
-        <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="mt-6 text-lg text-white/80 max-w-2xl mx-auto">
           CodeBuddy dispatches specialised AI agents against your GitHub repos — flagging outdated dependencies,
           dead code, and untested functions — and drafts the tests you're missing.
         </p>
         <div className="mt-10 flex flex-wrap gap-3 justify-center">
-          <Link to="/auth" className="rounded-md bg-primary px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:brightness-110">
+          <Link to="/auth" className="rounded-md bg-gradient-to-r from-primary to-accent px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/40 hover:brightness-110 transition">
             Start analyzing →
           </Link>
-          <a href="#agents" className="rounded-md border border-border bg-card/40 px-6 py-3 font-medium hover:bg-card">
+          <a href="#agents" className="rounded-md border border-accent/30 bg-white/5 px-6 py-3 font-medium text-white hover:bg-white/10 transition">
             Meet the agents
           </a>
         </div>
