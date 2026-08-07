@@ -21,7 +21,36 @@ export const Route = createFileRoute("/")({
 function Landing() {
   return (
     <div className="relative min-h-screen">
-      <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none" />
+      <div className="fixed inset-0 -z-10 pointer-events-none">
+        <ClientOnly fallback={null}>
+          <Suspense fallback={null}>
+            <GradientWaves
+              horizonColor="#0d1117"
+              waveColor="#1e6f5c"
+              crestColor="#6ee7b7"
+              speed={0.35}
+              amplitude={2.5}
+              waveScale={0.6}
+              waveRatio={0.9}
+              swell={35}
+              turbulence={20}
+              tilt={1.11}
+              zoom={1}
+              height={5.5}
+              fogDepth={15}
+              detail="medium"
+              brightness={0.9}
+              opacity={0.75}
+              mouseInteraction
+              parallaxStrength={0.5}
+              grain
+              grainIntensity={0.05}
+            />
+          </Suspense>
+        </ClientOnly>
+      </div>
+      <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
+
       <nav className="relative flex items-center justify-between px-6 py-5 md:px-12">
         <div className="flex items-center gap-2 font-mono text-sm font-bold">
           <div className="h-6 w-6 rounded bg-primary flex items-center justify-center text-primary-foreground">
