@@ -49,7 +49,10 @@ function Landing() {
           </Suspense>
         </ClientOnly>
       </div>
-      <div className="absolute inset-0 grid-bg opacity-20 pointer-events-none" />
+
+
+
+
 
       <nav className="relative flex items-center justify-between px-6 py-5 md:px-12">
         <div className="flex items-center gap-2 font-mono text-sm font-bold text-white">
