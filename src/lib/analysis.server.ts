@@ -133,6 +133,13 @@ export async function executeAnalysis(opts: {
       await supabaseAdmin.from("generated_tests").delete().eq("analysis_id", analysisId);
     }
     await supabaseAdmin.from("analysis_chunks").delete().eq("analysis_id", analysisId);
+  } else if (opts.attachAnalysisId) {
+    analysisId = opts.attachAnalysisId;
+    await supabaseAdmin.from("analyses").update({
+      status: "running", error: null, finished_at: null,
+      started_at: new Date().toISOString(),
+      agent_status: agentStatus as never,
+    }).eq("id", analysisId);
   } else {
     const { data: analysis } = await supabaseAdmin.from("analyses").insert({
       repo_id: repo.id,
