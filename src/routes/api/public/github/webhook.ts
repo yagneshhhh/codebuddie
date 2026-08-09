@@ -115,8 +115,10 @@ export const Route = createFileRoute("/api/public/github/webhook")({
           if (!plan) { skipped++; continue; }
 
           try {
-            const { executeAnalysis } = await import("@/lib/analysis.server");
-            const res = await executeAnalysis({
+            // Queue only — the worker runs the scan out-of-band so GitHub's
+            // 10s delivery timeout is never a factor.
+            const { enqueueAnalysisJob } = await import("@/lib/queue.server");
+            const res = await enqueueAnalysisJob({
               userId: repo.user_id,
               repoId: repo.id,
               trigger: plan.trigger,
@@ -124,9 +126,9 @@ export const Route = createFileRoute("/api/public/github/webhook")({
               commitSha: plan.sha,
               commitMessage: plan.message,
             });
-            started.push(res.id);
+            started.push(res.analysisId);
           } catch (e) {
-            console.error("webhook analysis failed", fullName, event, e);
+            console.error("webhook enqueue failed", fullName, event, e);
           }
         }
 
