@@ -90,6 +90,8 @@ export async function executeAnalysis(opts: {
   analysisId?: string;
   /** Restrict the run to a subset of agents (retry path). */
   only?: AgentName[];
+  /** Take over an already-created (queued) analysis row instead of inserting one. */
+  attachAnalysisId?: string;
 }): Promise<{ id: string; summary: string; status: string; agentStatus: Record<string, AgentState> }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { getRepoTree, getRawFile } = await import("@/lib/github.server");
@@ -131,6 +133,13 @@ export async function executeAnalysis(opts: {
       await supabaseAdmin.from("generated_tests").delete().eq("analysis_id", analysisId);
     }
     await supabaseAdmin.from("analysis_chunks").delete().eq("analysis_id", analysisId);
+  } else if (opts.attachAnalysisId) {
+    analysisId = opts.attachAnalysisId;
+    await supabaseAdmin.from("analyses").update({
+      status: "running", error: null, finished_at: null,
+      started_at: new Date().toISOString(),
+      agent_status: agentStatus as never,
+    }).eq("id", analysisId);
   } else {
     const { data: analysis } = await supabaseAdmin.from("analyses").insert({
       repo_id: repo.id,

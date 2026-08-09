@@ -90,13 +90,29 @@ export const getRepo = createServerFn({ method: "GET" })
     return { repo, analyses: analyses ?? [] };
   });
 
-// ── Run analysis (orchestrator) ─────────────────────────────────
+// ── Queue an analysis (async worker picks it up) ────────────────
 export const runAnalysis = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => z.object({ repoId: z.string() }).parse(i))
   .handler(async ({ data, context }) => {
-    const { executeAnalysis } = await import("@/lib/analysis.server");
-    return executeAnalysis({ userId: context.userId, repoId: data.repoId, trigger: "manual" });
+    const { enqueueAnalysisJob } = await import("@/lib/queue.server");
+    const { analysisId, jobId } = await enqueueAnalysisJob({
+      userId: context.userId, repoId: data.repoId, trigger: "manual",
+    });
+    return { id: analysisId, jobId, status: "queued" as const, summary: "Queued" };
+  });
+
+/** Pending/running queue entries for the signed-in user. */
+export const listQueuedJobs = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data } = await context.supabase
+      .from("analysis_jobs")
+      .select("id, analysis_id, repo_id, trigger, status, attempts, run_at, last_error, created_at")
+      .in("status", ["queued", "running"])
+      .order("created_at", { ascending: false })
+      .limit(20);
+    return data ?? [];
   });
 
 /** Re-run an analysis — failed agents only by default, or everything with `all`. */
