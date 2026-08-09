@@ -90,6 +90,8 @@ export async function executeAnalysis(opts: {
   analysisId?: string;
   /** Restrict the run to a subset of agents (retry path). */
   only?: AgentName[];
+  /** Take over an already-created (queued) analysis row instead of inserting one. */
+  attachAnalysisId?: string;
 }): Promise<{ id: string; summary: string; status: string; agentStatus: Record<string, AgentState> }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { getRepoTree, getRawFile } = await import("@/lib/github.server");
