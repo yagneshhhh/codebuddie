@@ -114,6 +114,81 @@ export type Database = {
           },
         ]
       }
+      analysis_jobs: {
+        Row: {
+          agents: string[] | null
+          analysis_id: string | null
+          attempts: number
+          commit_message: string | null
+          commit_sha: string | null
+          created_at: string
+          id: string
+          last_error: string | null
+          locked_at: string | null
+          max_attempts: number
+          ref: string | null
+          repo_id: string
+          run_at: string
+          status: string
+          trigger: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agents?: string[] | null
+          analysis_id?: string | null
+          attempts?: number
+          commit_message?: string | null
+          commit_sha?: string | null
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          locked_at?: string | null
+          max_attempts?: number
+          ref?: string | null
+          repo_id: string
+          run_at?: string
+          status?: string
+          trigger?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agents?: string[] | null
+          analysis_id?: string | null
+          attempts?: number
+          commit_message?: string | null
+          commit_sha?: string | null
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          locked_at?: string | null
+          max_attempts?: number
+          ref?: string | null
+          repo_id?: string
+          run_at?: string
+          status?: string
+          trigger?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_jobs_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_jobs_repo_id_fkey"
+            columns: ["repo_id"]
+            isOneToOne: false
+            referencedRelation: "repos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       findings: {
         Row: {
           agent: string
@@ -338,6 +413,34 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_analysis_jobs: {
+        Args: { p_limit?: number }
+        Returns: {
+          agents: string[] | null
+          analysis_id: string | null
+          attempts: number
+          commit_message: string | null
+          commit_sha: string | null
+          created_at: string
+          id: string
+          last_error: string | null
+          locked_at: string | null
+          max_attempts: number
+          ref: string | null
+          repo_id: string
+          run_at: string
+          status: string
+          trigger: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "analysis_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       match_analysis_chunks: {
         Args: {
           p_analysis_id: string
