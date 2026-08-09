@@ -17,6 +17,7 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedReposRepoIdRouteImport } from './routes/_authenticated/repos.$repoId'
 import { Route as AuthenticatedAnalysesIdRouteImport } from './routes/_authenticated/analyses.$id'
+import { Route as ApiPublicHooksProcessJobsRouteImport } from './routes/api/public/hooks/process-jobs'
 import { Route as ApiPublicGithubWebhookRouteImport } from './routes/api/public/github/webhook'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -59,6 +60,12 @@ const AuthenticatedAnalysesIdRoute = AuthenticatedAnalysesIdRouteImport.update({
   path: '/analyses/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicHooksProcessJobsRoute =
+  ApiPublicHooksProcessJobsRouteImport.update({
+    id: '/api/public/hooks/process-jobs',
+    path: '/api/public/hooks/process-jobs',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicGithubWebhookRoute = ApiPublicGithubWebhookRouteImport.update({
   id: '/api/public/github/webhook',
   path: '/api/public/github/webhook',
@@ -74,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/analyses/$id': typeof AuthenticatedAnalysesIdRoute
   '/repos/$repoId': typeof AuthenticatedReposRepoIdRoute
   '/api/public/github/webhook': typeof ApiPublicGithubWebhookRoute
+  '/api/public/hooks/process-jobs': typeof ApiPublicHooksProcessJobsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -84,6 +92,7 @@ export interface FileRoutesByTo {
   '/analyses/$id': typeof AuthenticatedAnalysesIdRoute
   '/repos/$repoId': typeof AuthenticatedReposRepoIdRoute
   '/api/public/github/webhook': typeof ApiPublicGithubWebhookRoute
+  '/api/public/hooks/process-jobs': typeof ApiPublicHooksProcessJobsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -96,6 +105,7 @@ export interface FileRoutesById {
   '/_authenticated/analyses/$id': typeof AuthenticatedAnalysesIdRoute
   '/_authenticated/repos/$repoId': typeof AuthenticatedReposRepoIdRoute
   '/api/public/github/webhook': typeof ApiPublicGithubWebhookRoute
+  '/api/public/hooks/process-jobs': typeof ApiPublicHooksProcessJobsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/analyses/$id'
     | '/repos/$repoId'
     | '/api/public/github/webhook'
+    | '/api/public/hooks/process-jobs'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/analyses/$id'
     | '/repos/$repoId'
     | '/api/public/github/webhook'
+    | '/api/public/hooks/process-jobs'
   id:
     | '__root__'
     | '/'
@@ -129,6 +141,7 @@ export interface FileRouteTypes {
     | '/_authenticated/analyses/$id'
     | '/_authenticated/repos/$repoId'
     | '/api/public/github/webhook'
+    | '/api/public/hooks/process-jobs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -138,6 +151,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiPublicGithubWebhookRoute: typeof ApiPublicGithubWebhookRoute
+  ApiPublicHooksProcessJobsRoute: typeof ApiPublicHooksProcessJobsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -198,6 +212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalysesIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hooks/process-jobs': {
+      id: '/api/public/hooks/process-jobs'
+      path: '/api/public/hooks/process-jobs'
+      fullPath: '/api/public/hooks/process-jobs'
+      preLoaderRoute: typeof ApiPublicHooksProcessJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/github/webhook': {
       id: '/api/public/github/webhook'
       path: '/api/public/github/webhook'
@@ -230,17 +251,8 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiChatRoute: ApiChatRoute,
   ApiPublicGithubWebhookRoute: ApiPublicGithubWebhookRoute,
+  ApiPublicHooksProcessJobsRoute: ApiPublicHooksProcessJobsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
