@@ -24,7 +24,7 @@ function RepoPage() {
     queryFn: () => getRepo({ data: { id: repoId } }),
     // Poll while a webhook-triggered analysis is still running.
     refetchInterval: (query) =>
-      query.state.data?.analyses?.some((a) => a.status === "running") ? 5000 : 15000,
+      query.state.data?.analyses?.some((a) => a.status === "running" || a.status === "queued") ? 5000 : 15000,
   });
   const run = useMutation({
     mutationFn: () => runAnalysis({ data: { repoId } }),

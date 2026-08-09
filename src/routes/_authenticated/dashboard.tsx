@@ -80,7 +80,7 @@ function JobStatus() {
     queryFn: () => listRecentAnalyses(),
     // Poll faster while something is still running (e.g. a push-triggered job).
     refetchInterval: (query) =>
-      query.state.data?.some((a) => a.status === "running") ? 5000 : 20000,
+      query.state.data?.some((a) => a.status === "running" || a.status === "queued") ? 5000 : 20000,
   });
   const rows = q.data ?? [];
   return (
@@ -98,7 +98,7 @@ function JobStatus() {
                   {(a as unknown as { repos?: { github_full_name: string } }).repos?.github_full_name}
                 </div>
                 <div className="text-xs text-muted-foreground truncate">
-                  {a.summary || (a.status === "failed" ? "Failed" : "Agents running…")}
+                  {a.summary || (a.status === "failed" ? "Failed" : a.status === "queued" ? "Waiting for a worker…" : "Agents running…")}
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
