@@ -11,8 +11,7 @@
 
 # 🛰️ CodeBuddy — Agentic Codebase Management System
 
-[![Live App](https://img.shields.io/badge/Live-https%3A%2F%2Fcodebuddie.lovable.app-5227FF?style=flat-square)](https://codebuddie.lovable.app)
-[![Built with Lovable](https://img.shields.io/badge/Built%20with-Lovable-FF9FFC?style=flat-square)](https://lovable.dev)
+[![Live App](https://img.shields.io/badge/Live-https%3A%2F%2Fcodebuddie.lovable.app-5227FF?style=flat-square)](https://codebuddie.netlify.app/)
 [![Stack](https://img.shields.io/badge/Stack-TanStack%20Start%20%2B%20React%2019-3178C6?style=flat-square)](#tech-stack)
 
 **CodeBuddy** is an agentic AI system that connects to your GitHub repository, dispatches a team of specialized AI agents against it, and turns the results into an actionable dashboard — finding **outdated dependencies**, flagging **dead code**, and writing **test coverage** for uncovered functions.
