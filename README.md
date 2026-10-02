@@ -8,7 +8,7 @@
 
 **CodeBuddy** is an agentic AI system that connects to your GitHub repository, dispatches a team of specialized AI agents against it, and turns the results into an actionable dashboard — finding **outdated dependencies**, flagging **dead code**, and writing **test coverage** for uncovered functions.
 
-> **Live app:** https://codebuddie.lovable.app
+> **Live app:** https://codebuddie.netlify.app/
 
 ---
 
