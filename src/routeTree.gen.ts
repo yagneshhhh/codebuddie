@@ -9,20 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedReposRepoIdRouteImport } from './routes/_authenticated/repos.$repoId'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AuthenticatedAnalysesIdRouteImport } from './routes/_authenticated/analyses.$id'
-import { Route as ApiPublicHooksProcessJobsRouteImport } from './routes/api/public/hooks/process-jobs'
+import { Route as AuthenticatedReposRepoIdRouteImport } from './routes/_authenticated/repos.$repoId'
 import { Route as ApiPublicGithubWebhookRouteImport } from './routes/api/public/github/webhook'
+import { Route as ApiPublicHooksProcessJobsRouteImport } from './routes/api/public/hooks/process-jobs'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -30,23 +34,24 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedAnalysesIdRoute = AuthenticatedAnalysesIdRouteImport.update({
+  id: '/analyses/$id',
+  path: '/analyses/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedReposRepoIdRoute =
@@ -55,10 +60,10 @@ const AuthenticatedReposRepoIdRoute =
     path: '/repos/$repoId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedAnalysesIdRoute = AuthenticatedAnalysesIdRouteImport.update({
-  id: '/analyses/$id',
-  path: '/analyses/$id',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const ApiPublicGithubWebhookRoute = ApiPublicGithubWebhookRouteImport.update({
+  id: '/api/public/github/webhook',
+  path: '/api/public/github/webhook',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHooksProcessJobsRoute =
   ApiPublicHooksProcessJobsRouteImport.update({
@@ -66,11 +71,6 @@ const ApiPublicHooksProcessJobsRoute =
     path: '/api/public/hooks/process-jobs',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicGithubWebhookRoute = ApiPublicGithubWebhookRouteImport.update({
-  id: '/api/public/github/webhook',
-  path: '/api/public/github/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -156,18 +156,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -177,18 +170,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -198,12 +191,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/repos/$repoId': {
-      id: '/_authenticated/repos/$repoId'
-      path: '/repos/$repoId'
-      fullPath: '/repos/$repoId'
-      preLoaderRoute: typeof AuthenticatedReposRepoIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/analyses/$id': {
       id: '/_authenticated/analyses/$id'
@@ -212,18 +205,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalysesIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/hooks/process-jobs': {
-      id: '/api/public/hooks/process-jobs'
-      path: '/api/public/hooks/process-jobs'
-      fullPath: '/api/public/hooks/process-jobs'
-      preLoaderRoute: typeof ApiPublicHooksProcessJobsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/repos/$repoId': {
+      id: '/_authenticated/repos/$repoId'
+      path: '/repos/$repoId'
+      fullPath: '/repos/$repoId'
+      preLoaderRoute: typeof AuthenticatedReposRepoIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/api/public/github/webhook': {
       id: '/api/public/github/webhook'
       path: '/api/public/github/webhook'
       fullPath: '/api/public/github/webhook'
       preLoaderRoute: typeof ApiPublicGithubWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/process-jobs': {
+      id: '/api/public/hooks/process-jobs'
+      path: '/api/public/hooks/process-jobs'
+      fullPath: '/api/public/hooks/process-jobs'
+      preLoaderRoute: typeof ApiPublicHooksProcessJobsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
