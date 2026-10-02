@@ -197,8 +197,3 @@ The app runs at `http://localhost:5173`.
 
 ---
 
-## 📄 License
-
-Built with [Lovable](https://lovable.dev). This code is yours — full ownership.
-
-**Live app:** https://codebuddie.lovable.app · **Continue in the editor:** https://lovable.dev/projects/657e01dc-8122-4675-9c0b-90414f0a57d0
