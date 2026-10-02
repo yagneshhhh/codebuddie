@@ -1,816 +1,162 @@
-# CodeBase Management System 
-
-hey , i want to create a codebase management system which finds outdated dependencies, flag dead code, write test coverage for uncovered functions . now , i want you to build one for me (in agentic AI way ) and i will give you the system architecture components , dependencies etc..... below,
-
-High Level Architecture
-
-I usually divide agentic systems into 7 layers.
-
-                    UI Layer
-
-                REST / GraphQL API
-
-             Orchestration Layer
-
-                Agent Layer
-
-              Memory / State Layer
-
-             Knowledge Layer (RAG)
-
-          Infrastructure / Execution
-
-1. UI Layer
-
-Responsible for interacting with users.
-
-Examples
-
-Dashboard
-
-Chat Interface
-
-Repository Overview
-
-Metrics
-
-Notifications
-
-Stack
-
-Frontend
-
-React
-
-Next.js
-
-Tailwind
-
-Shadcn UI
-
-Visualization
-
-Recharts
-
-D3
-
-Mermaid
-
-Monaco Editor
-
-Example
-
-Repositories
-
-✔ Backend
-
-✔ Frontend
-
-✔ ML Service
-
-Recent Events
-
-Added UserService
-
-Deleted Payment API
-
-Performance Warning
-
-Security Warning
-
-Chat
-
-Ask AI
-
-"What changed today?"
-
-2. API Layer
-
-Acts as the entry point.
-
-Responsibilities
-
-Authentication
-
-Repository registration
-
-Chat API
-
-Webhooks
-
-Trigger workflows
-
-Stack
-
-Python
-
-FastAPI
-
-Why?
-
-async
-
-fast
-
-OpenAPI
-
-ideal for AI services
-
-Endpoints
-
-POST /repo
-
-POST /chat
-
-POST /github/webhook
-
-GET /events
-
-GET /analysis
-
-3. Orchestration Layer
-
-This is the brain.
-
-This decides
-
-What happened?
-
-↓
-
-Which agent should run?
-
-↓
-
-Should another agent run?
-
-↓
-
-Should memory update?
-
-↓
-
-Should notification happen?
-
-Possible workflow
-
-GitHub Push
-
-↓
-
-Repository Agent
-
-↓
-
-Change Detection Agent
-
-↓
-
-Planning Agent
-
-↓
-
-Review Agent
-
-↓
-
-Documentation Agent
-
-↓
-
-Notification Agent
-
-Frameworks
-
-Best options
-
-LangGraph ⭐⭐⭐⭐⭐
-
-OpenAI Agents SDK
-
-Temporal (advanced workflows)
-
-Prefect (automation)
-
-n8n (low-code integration)
-
-My recommendation:
-
-LangGraph.
-
-Reason:
-
-Graph-based workflows match complex agent coordination naturally.
-
-4. Agent Layer
-
-This is where intelligence lives.
-
-Instead of one huge AI...
-
-Use many small agents.
-
-Example
-
-Repository Agent
-
-Review Agent
-
-Bug Agent
-
-Architecture Agent
-
-Performance Agent
-
-Security Agent
-
-Documentation Agent
-
-Testing Agent
-
-Dependency Agent
-
-Notification Agent
-
-Each has one responsibility.
-
-Example
-
-Review Agent
-
-Input
-
-Git Diff
-
-Output
-
-Possible Bug
-
-Missing Error Handling
-
-Complex Function
-
-Suggestions
-
-Architecture Agent
-
-Looks for
-
-Circular dependency
-
-Bad folder structure
-
-Huge classes
-
-Violated SOLID
-
-Design patterns
-
-Security Agent
-
-Looks for
-
-Hardcoded secrets
-
-SQL Injection
-
-Unsafe APIs
-
-Weak authentication
-
-Sensitive logging
-
-Documentation Agent
-
-Updates
-
-README
-
-API docs
-
-Architecture docs
-
-Changelog
-
-5. Model Layer
-
-Many beginners think
-
-"One GPT model."
-
-Wrong.
-
-Different tasks deserve different models.
-
-Example
-
-Large reasoning
-
-GPT-5.5
-
-Claude
-
-Gemini
-
-----------------
-
-Code
-
-GPT-5.5
-
-Claude Code
-
-DeepSeek Coder
-
-Qwen Coder
-
-----------------
-
-Embeddings
-
-text-embedding-3-large
-
-Voyage
-
-BGE
-
-----------------
-
-Reranker
-
-Cohere
-
-BGE Reranker
-
-Model Router
-
-Question
-
-↓
-
-Need reasoning?
-
-↓
-
-GPT
-
-↓
-
-Need code?
-
-↓
-
-Code model
-
-↓
-
-Need embeddings?
-
-↓
-
-Embedding model
-
-6. State Layer
-
-Very important.
-
-Agents need memory.
-
-Without memory
-
-Every request starts from zero.
-
-There are three kinds of memory.
-
-Working Memory
-
-Current workflow.
-
-Example
-
-Current PR
-
-Current Diff
-
-Current Conversation
-
-Redis is a common fit.
-
-Long-term Memory
-
-Stores
-
-Previous reviews
-
-Coding style
-
-Past bugs
-
-Repository history
-
-Developer preferences
-
-Database choices
-
-PostgreSQL
-
-MongoDB
-
-Semantic Memory
-
-Vector Database
-
-Stores
-
-Functions
-
-Classes
-
-Architecture
-
-Docs
-
-Commits
-
-PRs
-
-Code chunks
-
-Vector DB options
-
-Qdrant
-
-Weaviate
-
-Milvus
-
-pgvector
-
-For a first version, PostgreSQL + pgvector is a pragmatic choice.
-
-7. Knowledge Layer (RAG)
-
-The AI shouldn't rely only on its training.
-
-Instead
-
-Repository
-
-↓
-
-Parser
-
-↓
-
-Chunks
-
-↓
-
-Embeddings
-
-↓
-
-Vector DB
-
-↓
-
-Retriever
-
-↓
-
-LLM
-
-Sources
-
-Code
-
-README
-
-Wiki
-
-Architecture docs
-
-ADRs
-
-API docs
-
-Issues
-
-Pull Requests
-
-8. Infrastructure Layer
-
-Handles execution.
-
-GitHub Webhook
-
-↓
-
-RabbitMQ
-
-↓
-
-Workers
-
-↓
-
-Agents
-
-↓
-
-Database
-
-↓
-
-Notifications
-
-Useful technologies
-
-Containers
-
-Docker
-
-Orchestration
-
-Kubernetes (optional early on)
-
-Message Queue
-
-RabbitMQ
-
-Kafka
-
-Redis Streams
-
-Task Queue
-
-Celery
-
-Dramatiq
-
-Arq
-
-9. Event Layer
-
-Everything starts from events.
-
-Examples
-
-Push
-
-PR
-
-Issue
-
-Comment
-
-Merge
-
-Deployment
-
-Release
-
-Each event becomes
-
-Agent Task
-
-10. Tool Layer
-
-Agents become powerful because they can use tools.
-
-Typical tools
-
-Git
-
-GitHub API
-
-Filesystem
-
-Terminal
-
-Docker
-
-Pytest
-
-ESLint
-
-Mypy
-
-Ripgrep
-
-Tree-sitter
-
-Database
-
-Slack
-
-Jira
-
-An agent decides
-
-Need git diff?
-
-↓
-
-Use Git Tool
-
-↓
-
-Need tests?
-
-↓
-
-Run Pytest
-
-↓
-
-Need architecture?
-
-↓
-
-Parse AST
-
-11. Planning Layer
-
-A good agent plans before acting.
-
-Goal
-
-↓
-
-Break into tasks
-
-↓
-
-Execute
-
-↓
-
-Observe
-
-↓
-
-Continue
-
-This is where ReAct-style reasoning or graph-based planning fits well.
-
-12. Observability Layer
-
-Track what every agent does.
-
-Collect
-
-Agent execution time
-
-Prompt latency
-
-Tool usage
-
-Token consumption
-
-Failures
-
-Cost
-
-Success rate
-
-Popular tools
-
-OpenTelemetry
-
-Langfuse
-
-Phoenix
-
-Grafana
-
-Prometheus
-
-Complete Architecture
-
-                     React Dashboard
-
-                            │
-
-                     FastAPI Backend
-
-                            │
-
-                GitHub Webhooks / API
-
-                            │
-
-                 LangGraph Orchestrator
-
-                            │
-
-     ┌────────────┬────────────┬────────────┐
-
-     │            │            │            │
-
- Repository   Review      Security   Documentation
-
-    Agent      Agent        Agent        Agent
-
-     │            │            │            │
-
-     └────────────┴────────────┴────────────┘
-
-                            │
-
-                      Tool Execution
-
-        Git │ Tree-sitter │ Pytest │ GitHub API │ Filesystem
-
-                            │
-
-         PostgreSQL │ pgvector │ Redis │ Object Storage
-
-                            │
-
-                      Model Router
-
-      GPT-5.5 │ Claude │ Embedding Model │ Reranker
-
-                            │
-
-                   Notifications / Dashboard
-
-Suggested Tech Stack
-
-Layer	Recommended Stack
-
-Frontend	React, Next.js, Tailwind CSS, shadcn/ui
-
-Backend	FastAPI
-
-Authentication	JWT, OAuth with GitHub
-
-Agent Framework	LangGraph
-
-LLMs	GPT-5.5, Claude, DeepSeek Coder (optional for code-heavy tasks)
-
-Embeddings	text-embedding-3-large
-
-RAG	LlamaIndex or LangChain + pgvector
-
-Vector Store	PostgreSQL + pgvector
-
-Relational Data	PostgreSQL
-
-Cache / Short-term State	Redis
-
-Background Jobs	Celery or Arq
-
-Messaging	RabbitMQ or Redis Streams
-
-Code Parsing	Tree-sitter
-
-Git Integration	GitPython + GitHub API
-
-Execution Tools	Pytest, Ruff, MyPy, ESLint, Docker
-
-Observability	Langfuse + OpenTelemetry + Grafana
-
-Deployment	Docker Compose initially, Kubernetes later
-
-CI/CD	GitHub Actions
-
-Development Roadmap
-
-I would build this in progressively more capable versions rather than trying to implement every layer at once:
-
-MVP: Watch a GitHub repository, detect commits, summarize diffs with an LLM, and present results in a dashboard.
-
-RAG Integration: Index the repository, retrieve relevant code context, and make analyses repository-aware instead of diff-only.
-
-Multi-Agent System: Split responsibilities into specialized agents (review, security, documentation, architecture) coordinated by LangGraph.
-
-Tool Use: Give agents access to Git, AST parsing, test runners, linters, and the GitHub API so they can verify findings.
-
-Persistent Memory: Add Redis for workflow state and PostgreSQL/pgvector for long-term knowledge and semantic search.
-
-Autonomous Actions: Allow the system to create issues, comment on pull requests, update documentation, or trigger CI checks after human approval.
-
-Production Hardening: Add authentication, observability, rate limiting, retries, cost tracking, and containerized deployment.
-
-/// Also do ask me follow up questions , if there is any
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://codebuddie.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/657e01dc-8122-4675-9c0b-90414f0a57d0).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+<!-- LOVABLE:BEGIN -->
+> [!IMPORTANT]
+> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
+> published git history — force pushing, or rebasing/amending/squashing commits
+> that are already pushed — as it rewrites history on Lovable's side and the
+> user will likely lose their project history.
+>
+> Commits you push to the connected branch sync back to Lovable and show up in
+> the editor, so keep the branch in a working state.
+<!-- LOVABLE:END -->
+
+# 🛰️ CodeBuddy — Agentic Codebase Management System
+
+[![Live App](https://img.shields.io/badge/Live-https%3A%2F%2Fcodebuddie.lovable.app-5227FF?style=flat-square)](https://codebuddie.lovable.app)
+[![Built with Lovable](https://img.shields.io/badge/Built%20with-Lovable-FF9FFC?style=flat-square)](https://lovable.dev)
+[![Stack](https://img.shields.io/badge/Stack-TanStack%20Start%20%2B%20React%2019-3178C6?style=flat-square)](#tech-stack)
+
+**CodeBuddy** is an agentic AI system that connects to your GitHub repository, dispatches a team of specialized AI agents against it, and turns the results into an actionable dashboard — finding **outdated dependencies**, flagging **dead code**, and writing **test coverage** for uncovered functions.
+
+> **Live app:** https://codebuddie.lovable.app
+
+---
+
+## ✨ Features
+
+### 🔍 Dependency Agent
+- Parses `package.json` and `requirements.txt`.
+- Checks the live npm / PyPI registries for the latest versions of every dependency.
+- Flags outdated packages with current vs. latest versions, severity-rated.
+
+### 🧟 Dead Code Agent
+- Pulls JS/TS/Python source files from the repo.
+- Uses an AI reviewer to identify unused exports, unreferenced functions, unreachable branches, and commented-out code kept "just in case".
+- Only reports high-confidence candidates, so you don't drown in noise.
+
+### 🧪 Test Coverage Agent
+- Detects source files with no matching `*.test.*` / `*.spec.*` / `*_test.py` file.
+- Generates runnable **Vitest** or **pytest** stubs for the top uncovered functions.
+- Copy the generated tests straight from the dashboard.
+
+### 🤖 Autonomous GitHub Actions
+- **One-click Pull Request** — CodeBuddy creates a branch (`codebuddy/analysis-<id>`), commits a full markdown analysis report to `.sentinel/`, pushes all generated test files, opens a PR, and posts an autonomous review comment with the critical findings.
+- **Webhooks** — push, `pull_request` (opened/reopened/synchronize/ready_for_review), and failed `workflow_run` events automatically trigger a fresh analysis of the affected branch, with HMAC signature verification.
+
+### 📊 Dashboard & Orchestration Timeline
+- Repo list, run history, and findings grouped by agent and severity.
+- A live job timeline shows every orchestration step (`fetch:tree`, `dependency:start`, `orchestrator:done`, …) with durations and attempt counts.
+- Per-agent retries with exponential backoff — one failing agent never blocks the rest. Re-run only the failed agents with a single click.
+
+### 💬 Ask-About-This-Repo Chat
+- A conversational panel over each analysis, powered by **pgvector semantic search**.
+- Findings, generated tests, and source-code snippets are chunked and embedded during every analysis; chat retrieves the most relevant context via cosine similarity before answering.
+
+### ⚙️ Background Job Queue
+- Scans run asynchronously: requests enqueue a job and the dashboard polls for status, so long analyses never time out.
+- A worker drains the queue with `FOR UPDATE SKIP LOCKED` job claiming, retry/backoff, and stale-lock recovery.
+
+---
+
+## 🏗️ Architecture
+
+CodeBuddy is built as an **agentic system** organized into layers:
+
+```
+                 React Dashboard (TanStack Start + Tailwind + shadcn/ui)
+                                   │
+                     Typed RPC (TanStack server functions)
+                                   │
+                     GitHub Webhooks / API  ·  Background Queue
+                                   │
+                          Orchestrator (Promise.all fan-out)
+                                   │
+        ┌──────────────────┬──────────────────┬──────────────────┐
+        │                  │                  │                  │
+   Dependency Agent  Dead Code Agent  Test Coverage Agent   Chat (RAG)
+        │                  │                  │                  │
+        └──────────────────┴──────────────────┴──────────────────┘
+                                   │
+                          Tool Execution
+           GitHub API │ npm / PyPI registries │ Lovable AI Gateway
+                                   │
+                 PostgreSQL (Lovable Cloud) + pgvector
+```
+
+### The 12 layers, mapped
+
+| Layer | Design | Implementation in CodeBuddy |
+| --- | --- | --- |
+| **UI** | Dashboard, chat, repo overview, metrics | TanStack Start + React 19 + Tailwind v4 + shadcn/ui + Recharts + `ogl` animated background |
+| **API** | Auth, repo registration, chat, webhooks, triggers | TanStack `createServerFn` typed RPC + server routes under `/api` |
+| **Orchestration** | Decide which agents run, coordinate results | `executeAnalysis` orchestrator: parallel agent fan-out via `Promise.allSettled`, per-agent retries, partial-success states |
+| **Agent** | Many small agents, one responsibility each | 3 specialized agents (`src/lib/agents/`): Dependency, Dead Code, Test Coverage |
+| **Model** | Right model for the right task | Lovable AI Gateway — `google/gemini-3-flash-preview` for agents, `google/gemini-embedding-001` for embeddings |
+| **State / Memory** | Working, long-term, semantic memory | PostgreSQL (Lovable Cloud): repos, analyses, findings, generated tests, job events |
+| **Knowledge (RAG)** | Repo → chunks → embeddings → retrieval | pgvector + `analysis_chunks` table (3072-dim), cosine-similarity retrieval via `match_analysis_chunks` RPC |
+| **Infrastructure** | Queue, workers, async execution | `analysis_jobs` table + worker endpoint with `FOR UPDATE SKIP LOCKED` claiming, retries, stale-lock recovery |
+| **Event** | Everything starts from an event | GitHub webhooks (push / PR / workflow_run) + manual triggers, recorded as `job_events` |
+| **Tool** | Agents use tools | GitHub REST API, npm registry, PyPI, Lovable AI Gateway |
+| **Planning** | Plan → execute → observe | Fixed per-agent prompt templates (dynamic ReAct-style planning deferred) |
+| **Observability** | Track every agent step | `job_events` audit timeline (agent, event, status, duration, attempts) + server-fn logs |
+
+---
+
+## 🗄️ Data Model
+
+```
+profiles(id → auth.users, display_name, created_at)
+repos(id, user_id, github_full_name, default_branch, webhook_secret, webhook_enabled, last_event_at, created_at)
+analyses(id, repo_id, user_id, status, trigger, ref, commit_sha, commit_message, agent_status, summary, error, started_at, finished_at)
+findings(id, analysis_id, agent, severity, title, detail, file_path, line, metadata)
+generated_tests(id, analysis_id, source_file, target_function, test_code, language)
+job_events(id, analysis_id, agent, event, status, message, attempt, duration_ms, created_at)
+analysis_jobs(id, user_id, repo_id, analysis_id, trigger, ref, agents, status, attempts, max_attempts, run_at, locked_at, last_error)
+analysis_chunks(id, analysis_id, source, content, embedding vector(3072))
+```
+
+- **Row Level Security** on every table — users only see their own repos, analyses, findings, and tests (findings/tests/events scoped via `analysis_id → analyses.user_id`).
+- GitHub access tokens are stored **AES-256-GCM encrypted** server-side.
+- `job_events` is an append-only audit log — insert is owner-scoped, update/delete revoked.
+
+---
+
+## 🔌 API Surface
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /api/public/github/webhook` | HMAC-verified GitHub webhook → auto-analysis on push / PR / failed CI |
+| `GET|POST /api/public/hooks/process-jobs` | Key-protected worker that drains the analysis job queue |
+| `/api/chat` | Streaming RAG chat over an analysis |
+| `startGithubConnect` / `saveGithubConnection` | GitHub App User Connector authorization flow |
+| `listUserRepos` / `addRepo` | Browse and register repositories |
+| `runAnalysis` / `retryAnalysis` | Enqueue a full or partial (failed-agents-only) analysis |
+| `getAnalysis` / `listAnalyses` / `getJobEvents` | Read analyses and orchestration timelines |
+| `createAnalysisPR` | Branch + report + tests + PR + autonomous review comment |
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Framework | TanStack Start v1 (React 19, Vite, SSR) |
+| Styling | Tailwind CSS v4 + shadcn/ui |
+| Agents / LLM | AI SDK v7 + Lovable AI Gateway (`gemini-3-flash-preview`) |
+| Embeddings | `google/gemini-embedding-001` (3072-dim) |
+| Database | PostgreSQL (Lovable Cloud) + pgvector |
+| Auth | Email/password + Google (Lovable Cloud Auth) |
+| GitHub | GitHub REST API via App User Connector |
+| Visualization | Recharts + custom `ogl` WebGL gradient background |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 20+ (use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- npm
+
+### Local development
 
 ```sh
 git clone <this-repository-url>
@@ -818,3 +164,50 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+The app runs at `http://localhost:5173`.
+
+### Connecting GitHub
+1. Sign up / sign in at the live app.
+2. Click **Connect GitHub** and authorize your account (read access to repos; **Contents** and **Pull requests** read/write permissions are needed for autonomous PR generation).
+3. Pick a repository and hit **Run analysis**.
+
+> [!NOTE]
+> If PR creation returns `403: Resource not accessible by personal access token`, your token is read-only — grant it **Contents: Read and write** and **Pull requests: Read and write**.
+
+### Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint |
+| `npm run format` | Prettier |
+
+---
+
+## 🗺️ Roadmap
+
+**Shipped**
+- ✅ Multi-agent analysis (dependencies, dead code, test coverage)
+- ✅ pgvector RAG chat
+- ✅ Autonomous PR generation + review comments
+- ✅ GitHub webhooks (push / PR / workflow_run)
+- ✅ Background job queue with retries
+- ✅ Orchestration timeline & observability
+
+**Planned**
+- 🔲 ReAct-style dynamic planning loops
+- 🔲 Formal AI SDK `tool()` abstractions per agent
+- 🔲 Email / Slack notifications
+- 🔲 More languages (Go, Rust, Java)
+- 🔲 Security & architecture agents (hardcoded secrets, circular deps, SOLID violations)
+- 🔲 Multi-model routing (code-heavy tasks on specialized models)
+
+---
+
+## 📄 License
+
+Built with [Lovable](https://lovable.dev). This code is yours — full ownership.
+
+**Live app:** https://codebuddie.lovable.app · **Continue in the editor:** https://lovable.dev/projects/657e01dc-8122-4675-9c0b-90414f0a57d0
