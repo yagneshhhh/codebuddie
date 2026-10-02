@@ -1,17 +1,9 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+
+
 
 # 🛰️ CodeBuddy — Agentic Codebase Management System
 
-[![Live App](https://img.shields.io/badge/Live-https%3A%2F%2Fcodebuddie.lovable.app-5227FF?style=flat-square)](https://codebuddie.netlify.app/)
+[![Live App](https://img.shields.io/badge/Live-https://codebuddie.netlify.app/-5227FF?style=flat-square)](https://codebuddie.netlify.app/)
 [![Stack](https://img.shields.io/badge/Stack-TanStack%20Start%20%2B%20React%2019-3178C6?style=flat-square)](#tech-stack)
 
 **CodeBuddy** is an agentic AI system that connects to your GitHub repository, dispatches a team of specialized AI agents against it, and turns the results into an actionable dashboard — finding **outdated dependencies**, flagging **dead code**, and writing **test coverage** for uncovered functions.
